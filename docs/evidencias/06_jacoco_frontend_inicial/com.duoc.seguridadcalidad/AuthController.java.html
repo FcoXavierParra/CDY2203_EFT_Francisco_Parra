@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AuthController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">seguridadcalidad</a> &gt; <a href="index.source.html" class="el_package">com.duoc.seguridadcalidad</a> &gt; <span class="el_source">AuthController.java</span></div><h1>AuthController.java</h1><pre class="source lang-java linenums">package com.duoc.seguridadcalidad;
+
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.AuthorityUtils;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.HttpStatusCodeException;
+import org.springframework.web.client.ResourceAccessException;
+
+@RestController
+@RequestMapping(&quot;/api/auth&quot;)
+public class AuthController {
+
+<span class="fc" id="L25">    private static final Logger log = LoggerFactory.getLogger(AuthController.class);</span>
+    private final BackendService backendService;
+
+<span class="fc" id="L28">    public AuthController(BackendService backendService) {</span>
+<span class="fc" id="L29">        this.backendService = backendService;</span>
+<span class="fc" id="L30">    }</span>
+
+    @PostMapping(&quot;/login&quot;)
+    public ResponseEntity&lt;?&gt; createAuthenticationToken(@RequestBody AuthRequest authRequest, HttpServletRequest request) {
+<span class="fc" id="L34">        log.debug(&quot;POST /api/auth/login req={}&quot;, authRequest);</span>
+        try {
+<span class="fc" id="L36">            AuthResponse authResponse = backendService.login(authRequest);</span>
+
+<span class="fc" id="L38">            UsernamePasswordAuthenticationToken authentication =</span>
+                    new UsernamePasswordAuthenticationToken(
+<span class="fc" id="L40">                            authRequest.getUsername(),</span>
+                            null,
+<span class="fc" id="L42">                            AuthorityUtils.createAuthorityList(&quot;ROLE_USER&quot;));</span>
+<span class="fc" id="L43">            SecurityContext context = SecurityContextHolder.createEmptyContext();</span>
+<span class="fc" id="L44">            context.setAuthentication(authentication);</span>
+<span class="fc" id="L45">            SecurityContextHolder.setContext(context);</span>
+
+<span class="fc" id="L47">            HttpSession session = request.getSession(true);</span>
+<span class="fc" id="L48">            session.setAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY, context);</span>
+
+<span class="fc" id="L50">            log.debug(&quot;POST /api/auth/login res={}&quot;, authResponse);</span>
+<span class="fc" id="L51">            return ResponseEntity.ok(authResponse);</span>
+<span class="fc" id="L52">        } catch (HttpStatusCodeException ex) {</span>
+<span class="fc" id="L53">            return ResponseEntity.status(ex.getStatusCode()).body(ex.getResponseBodyAsString());</span>
+<span class="fc" id="L54">        } catch (ResourceAccessException ex) {</span>
+<span class="fc" id="L55">            log.error(&quot;Error de conexion con el backend: {}&quot;, ex.getMessage());</span>
+<span class="fc" id="L56">            return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(&quot;El servicio de backend no esta disponible.&quot;);</span>
+<span class="fc" id="L57">        } catch (Exception ex) {</span>
+<span class="fc" id="L58">            log.error(&quot;POST /api/auth/login error&quot;, ex);</span>
+<span class="fc" id="L59">            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(&quot;Error interno del servidor&quot;);</span>
+        }
+    }
+
+    @PostMapping(&quot;/logout&quot;)
+    public ResponseEntity&lt;Void&gt; logout(HttpServletRequest request) {
+<span class="fc" id="L65">        HttpSession session = request.getSession(false);</span>
+<span class="pc bpc" id="L66" title="1 of 2 branches missed.">        if (session != null) {</span>
+<span class="fc" id="L67">            session.invalidate();</span>
+        }
+<span class="fc" id="L69">        SecurityContextHolder.clearContext();</span>
+<span class="fc" id="L70">        return ResponseEntity.noContent().build();</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.14.202510111229</span></div></body></html>

@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>PatientController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">backend</a> &gt; <a href="index.source.html" class="el_package">com.duoc.backend</a> &gt; <span class="el_source">PatientController.java</span></div><h1>PatientController.java</h1><pre class="source lang-java linenums">package com.duoc.backend;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.Map;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Optional;
+
+@RestController
+<span class="fc" id="L19">public class PatientController {</span>
+
+    @Autowired
+    private PatientRepository patientRepository;
+
+    @PostMapping(&quot;/patients&quot;)
+    public ResponseEntity&lt;?&gt; createPatient(@RequestBody Patient patient) {
+        try {
+<span class="fc" id="L27">            patientRepository.save(patient);</span>
+<span class="fc" id="L28">            return ResponseEntity.status(HttpStatus.CREATED).body(patient);</span>
+<span class="fc" id="L29">        } catch (Exception e) {</span>
+<span class="fc" id="L30">            Map&lt;String, String&gt; error = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L31">            error.put(&quot;message&quot;, &quot;Error al registrar: &quot; + e.getMessage());</span>
+<span class="fc" id="L32">            return ResponseEntity.badRequest().body(error);</span>
+            //return ResponseEntity.badRequest().body(&quot;Error registering patient: &quot; + e.getMessage());
+        }
+    }
+
+    @GetMapping(&quot;/patients&quot;)
+    public ResponseEntity&lt;Iterable&lt;Patient&gt;&gt; getAllPatients() {
+        try {
+<span class="fc" id="L40">            Iterable&lt;Patient&gt; patients = patientRepository.findAll();</span>
+<span class="fc" id="L41">            return ResponseEntity.ok(patients);</span>
+<span class="nc" id="L42">        } catch (Exception e) {</span>
+<span class="nc" id="L43">            return ResponseEntity.internalServerError().build();</span>
+        }
+    }
+
+    @GetMapping(&quot;/patients/{id}&quot;)
+    public ResponseEntity&lt;Patient&gt; getPatientById(@PathVariable Long id) {
+        try {
+<span class="fc" id="L50">            Optional&lt;Patient&gt; patient = patientRepository.findById(id);</span>
+<span class="pc bpc" id="L51" title="1 of 2 branches missed.">            if (patient.isPresent()) {</span>
+<span class="nc" id="L52">                return ResponseEntity.ok(patient.get());</span>
+            } else {
+<span class="fc" id="L54">                return ResponseEntity.notFound().build();</span>
+            }
+<span class="nc" id="L56">        } catch (Exception e) {</span>
+<span class="nc" id="L57">            return ResponseEntity.internalServerError().build();</span>
+        }
+    }
+
+    @DeleteMapping(&quot;/patients/{id}&quot;)
+    public ResponseEntity&lt;String&gt; deletePatient(@PathVariable Long id) {
+        try {
+<span class="fc bfc" id="L64" title="All 2 branches covered.">            if (!patientRepository.existsById(id)) {</span>
+<span class="fc" id="L65">                return ResponseEntity.notFound().build();</span>
+            }
+<span class="nc" id="L67">            patientRepository.deleteById(id);</span>
+<span class="nc" id="L68">            return ResponseEntity.ok(&quot;Patient deleted successfully&quot;);</span>
+<span class="fc" id="L69">        } catch (Exception e) {</span>
+<span class="fc" id="L70">            return ResponseEntity.internalServerError().body(&quot;Error deleting patient: &quot; + e.getMessage());</span>
+        }
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.14.202510111229</span></div></body></html>

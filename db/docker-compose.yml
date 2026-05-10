@@ -1,0 +1,35 @@
+services:
+  mysql-cdy2203-1:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: mydatabase
+      MYSQL_USER: myuser
+      MYSQL_PASSWORD: password
+    ports:
+      - "3306:3306"
+
+  backend:
+    build: ../cdy2203-backend-2026-201-main/cdy2203-backend-2026-201-main  # Ajusta la ruta a tu proyecto backend
+    ports:
+      - "8081:8080"   # HTTP, para frontend y flujo interno
+      - "8443:8443"   # HTTPS, para pruebas locales seguras
+    depends_on:
+      - mysql-cdy2203-1
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql-cdy2203-1:3306/mydatabase
+      SPRING_DATASOURCE_USERNAME: myuser
+      SPRING_DATASOURCE_PASSWORD: password
+      SERVER_SSL_ENABLED: "false"
+
+  frontend:
+    build: ../cdy2203-2026-201-main/cdy2203-2026-201-main # Ajusta la ruta a tu proyecto frontend
+    ports:
+      - "8080:8080"
+    depends_on:
+      - backend
+    environment:
+      # Esta variable debe coincidir con la que uses en tu RestTemplate
+      BACKEND_URL: http://backend:8080

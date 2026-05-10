@@ -1,0 +1,46 @@
+# Trivy ignore — CVEs upstream pendientes
+# Cada entrada incluye: ID CVE, motivo de la suspension, y plan de revision.
+# Reglas:
+#   - Solo se suprimen CVEs cuya correccion depende de un proveedor externo
+#     (Oracle / Docker Hub / runtime base de la imagen).
+#   - El codigo y dependencias propias de la app (backend Spring Boot, frontend)
+#     NUNCA usan supresion: si un CVE aplica a algo que controlamos, se parcha.
+#   - Estas supresiones se revisan al menos una vez por sprint.
+
+# ============================================================================
+# Imagen mysql:8.4.9 (oficial de Oracle/Docker Hub) - Go stdlib v1.24.6 bundled
+# ============================================================================
+# Las imagenes oficiales de mysql:8.4.x al 2026-05-09 traen un binario Go
+# compilado con stdlib 1.24.6, anterior a los patches de mayo/2026.
+# La correccion (Go 1.24.13 / 1.25.7) requiere que Oracle regenere la imagen.
+# Mientras tanto, los binarios afectados no son ejecutados con privilegios ni
+# expuestos al exterior (el contenedor solo expone el puerto 3306 al backend).
+# Plan: revisar mensualmente disponibilidad de mysql:8.4.10+ o reemplazo upstream.
+
+CVE-2025-68121   # crypto/tls TLS session resumption cert validation (CVSS 10)
+CVE-2025-58183
+CVE-2025-61726
+CVE-2025-61728
+CVE-2025-61729
+CVE-2026-25679
+
+# ============================================================================
+# Imagen mysql:8.4.9 - pyOpenSSL 25.3.0 (paquete del SO de la imagen)
+# ============================================================================
+# La libreria pyOpenSSL viene como dependencia del SO de la imagen oficial.
+# El backend no usa Python; el binding solo es invocado por scripts de bootstrap
+# de la imagen.
+# Plan: resolver al actualizar a mysql >= 8.4.10 (incluye pyOpenSSL 26+).
+
+CVE-2026-27459
+
+# ============================================================================
+# /usr/local/bin/gosu - Go binary bundled en imagen mysql para switch de UID
+# ============================================================================
+# gosu se compila con la misma stdlib Go vulnerable. Pendiente de regenerar
+# por upstream cuando incluyan Go 1.25.9+. No es ejecutado por usuarios finales,
+# solo por el ENTRYPOINT del contenedor para drop privileges.
+
+CVE-2026-32280
+CVE-2026-32281
+CVE-2026-32283

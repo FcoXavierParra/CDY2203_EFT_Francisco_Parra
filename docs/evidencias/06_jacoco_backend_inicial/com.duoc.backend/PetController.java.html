@@ -1,0 +1,214 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>PetController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">backend</a> &gt; <a href="index.source.html" class="el_package">com.duoc.backend</a> &gt; <span class="el_source">PetController.java</span></div><h1>PetController.java</h1><pre class="source lang-java linenums">package com.duoc.backend;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
+@RestController
+<span class="fc" id="L21">public class PetController {</span>
+
+    @Autowired
+    private PetRepository petRepository;
+
+    @PostMapping(&quot;/pets&quot;)
+    public ResponseEntity&lt;?&gt; createPet(@RequestBody Pet pet) {
+        try {
+<span class="fc" id="L29">            petRepository.save(pet);</span>
+<span class="fc" id="L30">            return ResponseEntity.status(HttpStatus.CREATED).body(pet);</span>
+<span class="fc" id="L31">        } catch (Exception e) {</span>
+<span class="fc" id="L32">            Map&lt;String, String&gt; error = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L33">            error.put(&quot;message&quot;, &quot;Error al registrar mascota: &quot; + e.getMessage());</span>
+<span class="fc" id="L34">            return ResponseEntity.badRequest().body(error);</span>
+        }
+    }
+
+    @GetMapping(&quot;/pets&quot;)
+    public ResponseEntity&lt;Iterable&lt;Pet&gt;&gt; getAllPets() {
+        try {
+<span class="nc" id="L41">            Iterable&lt;Pet&gt; pets = petRepository.findAll();</span>
+<span class="nc" id="L42">            return ResponseEntity.ok(pets);</span>
+<span class="nc" id="L43">        } catch (Exception e) {</span>
+<span class="nc" id="L44">            return ResponseEntity.internalServerError().build();</span>
+        }
+    }
+
+    @GetMapping(&quot;/pets/available&quot;)
+    public ResponseEntity&lt;List&lt;Pet&gt;&gt; getAvailablePets() {
+        try {
+<span class="fc" id="L51">            List&lt;Pet&gt; pets = petRepository.findByStatus(&quot;available&quot;);</span>
+<span class="fc" id="L52">            return ResponseEntity.ok(pets);</span>
+<span class="nc" id="L53">        } catch (Exception e) {</span>
+<span class="nc" id="L54">            return ResponseEntity.internalServerError().build();</span>
+        }
+    }
+
+    @GetMapping(&quot;/pets/{id}&quot;)
+    public ResponseEntity&lt;Pet&gt; getPetById(@PathVariable Long id) {
+        try {
+<span class="fc" id="L61">            Optional&lt;Pet&gt; pet = petRepository.findById(id);</span>
+<span class="pc bpc" id="L62" title="1 of 2 branches missed.">            if (pet.isPresent()) {</span>
+<span class="nc" id="L63">                return ResponseEntity.ok(pet.get());</span>
+            } else {
+<span class="fc" id="L65">                return ResponseEntity.notFound().build();</span>
+            }
+<span class="nc" id="L67">        } catch (Exception e) {</span>
+<span class="nc" id="L68">            return ResponseEntity.internalServerError().build();</span>
+        }
+    }
+
+    @PutMapping(&quot;/pets/{id}&quot;)
+    public ResponseEntity&lt;?&gt; updatePet(@PathVariable Long id, @RequestBody Pet petDetails) {
+        try {
+<span class="fc" id="L75">            Optional&lt;Pet&gt; pet = petRepository.findById(id);</span>
+<span class="pc bpc" id="L76" title="1 of 2 branches missed.">            if (pet.isPresent()) {</span>
+<span class="fc" id="L77">                Pet existingPet = pet.get();</span>
+<span class="pc bpc" id="L78" title="1 of 2 branches missed.">                if (petDetails.getName() != null) {</span>
+<span class="fc" id="L79">                    existingPet.setName(petDetails.getName());</span>
+                }
+<span class="pc bpc" id="L81" title="1 of 2 branches missed.">                if (petDetails.getSpecies() != null) {</span>
+<span class="nc" id="L82">                    existingPet.setSpecies(petDetails.getSpecies());</span>
+                }
+<span class="pc bpc" id="L84" title="1 of 2 branches missed.">                if (petDetails.getBreed() != null) {</span>
+<span class="nc" id="L85">                    existingPet.setBreed(petDetails.getBreed());</span>
+                }
+<span class="pc bpc" id="L87" title="1 of 2 branches missed.">                if (petDetails.getAge() != null) {</span>
+<span class="nc" id="L88">                    existingPet.setAge(petDetails.getAge());</span>
+                }
+<span class="pc bpc" id="L90" title="1 of 2 branches missed.">                if (petDetails.getGender() != null) {</span>
+<span class="nc" id="L91">                    existingPet.setGender(petDetails.getGender());</span>
+                }
+<span class="pc bpc" id="L93" title="1 of 2 branches missed.">                if (petDetails.getLocation() != null) {</span>
+<span class="fc" id="L94">                    existingPet.setLocation(petDetails.getLocation());</span>
+                }
+<span class="pc bpc" id="L96" title="1 of 2 branches missed.">                if (petDetails.getPhotos() != null) {</span>
+<span class="nc" id="L97">                    existingPet.setPhotos(petDetails.getPhotos());</span>
+                }
+<span class="pc bpc" id="L99" title="1 of 2 branches missed.">                if (petDetails.getStatus() != null) {</span>
+<span class="fc" id="L100">                    existingPet.setStatus(petDetails.getStatus());</span>
+                }
+<span class="fc" id="L102">                petRepository.save(existingPet);</span>
+<span class="fc" id="L103">                return ResponseEntity.ok(existingPet);</span>
+            } else {
+<span class="nc" id="L105">                return ResponseEntity.notFound().build();</span>
+            }
+<span class="nc" id="L107">        } catch (Exception e) {</span>
+<span class="nc" id="L108">            Map&lt;String, String&gt; error = new HashMap&lt;&gt;();</span>
+<span class="nc" id="L109">            error.put(&quot;message&quot;, &quot;Error al actualizar mascota: &quot; + e.getMessage());</span>
+<span class="nc" id="L110">            return ResponseEntity.badRequest().body(error);</span>
+        }
+    }
+
+    @DeleteMapping(&quot;/pets/{id}&quot;)
+    public ResponseEntity&lt;?&gt; deletePet(@PathVariable Long id) {
+        try {
+<span class="fc" id="L117">            Optional&lt;Pet&gt; pet = petRepository.findById(id);</span>
+<span class="pc bpc" id="L118" title="1 of 2 branches missed.">            if (pet.isPresent()) {</span>
+<span class="nc" id="L119">                petRepository.deleteById(id);</span>
+<span class="nc" id="L120">                Map&lt;String, String&gt; response = new HashMap&lt;&gt;();</span>
+<span class="nc" id="L121">                response.put(&quot;message&quot;, &quot;Mascota eliminada exitosamente&quot;);</span>
+<span class="nc" id="L122">                return ResponseEntity.ok(response);</span>
+            } else {
+<span class="nc" id="L124">                return ResponseEntity.notFound().build();</span>
+            }
+<span class="fc" id="L126">        } catch (Exception e) {</span>
+<span class="fc" id="L127">            Map&lt;String, String&gt; error = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L128">            error.put(&quot;message&quot;, &quot;Error al eliminar mascota: &quot; + e.getMessage());</span>
+<span class="fc" id="L129">            return ResponseEntity.badRequest().body(error);</span>
+        }
+    }
+
+    @GetMapping(&quot;/pets/search&quot;)
+    public ResponseEntity&lt;List&lt;Pet&gt;&gt; searchPets(
+            @RequestParam(required = false) String species,
+            @RequestParam(required = false) String gender,
+            @RequestParam(required = false) String location,
+            @RequestParam(required = false) Integer age,
+            @RequestParam(defaultValue = &quot;available&quot;) String status) {
+        try {
+            List&lt;Pet&gt; pets;
+
+            // Caso 1: Todos los criterios
+<span class="pc bpc" id="L144" title="2 of 8 branches missed.">            if (species != null &amp;&amp; gender != null &amp;&amp; location != null &amp;&amp; age != null) {</span>
+<span class="fc" id="L145">                pets = petRepository.findBySpeciesAndGenderAndLocationAndAgeAndStatus(species, gender, location, age, status);</span>
+            }
+            // Caso 2: Especie, Género, Ubicación
+<span class="pc bpc" id="L148" title="3 of 6 branches missed.">            else if (species != null &amp;&amp; gender != null &amp;&amp; location != null) {</span>
+<span class="nc" id="L149">                pets = petRepository.findBySpeciesAndGenderAndLocationAndStatus(species, gender, location, status);</span>
+            }
+            // Caso 3: Especie, Género, Edad
+<span class="pc bpc" id="L152" title="3 of 6 branches missed.">            else if (species != null &amp;&amp; gender != null &amp;&amp; age != null) {</span>
+<span class="nc" id="L153">                pets = petRepository.findBySpeciesAndGenderAndAgeAndStatus(species, gender, age, status);</span>
+            }
+            // Caso 4: Especie, Ubicación, Edad
+<span class="pc bpc" id="L156" title="3 of 6 branches missed.">            else if (species != null &amp;&amp; location != null &amp;&amp; age != null) {</span>
+<span class="nc" id="L157">                pets = petRepository.findBySpeciesAndLocationAndAgeAndStatus(species, location, age, status);</span>
+            }
+            // Caso 5: Género, Ubicación, Edad
+<span class="pc bpc" id="L160" title="5 of 6 branches missed.">            else if (gender != null &amp;&amp; location != null &amp;&amp; age != null) {</span>
+<span class="nc" id="L161">                pets = petRepository.findByGenderAndLocationAndAgeAndStatus(gender, location, age, status);</span>
+            }
+            // Caso 6: Especie, Género
+<span class="pc bpc" id="L164" title="1 of 4 branches missed.">            else if (species != null &amp;&amp; gender != null) {</span>
+<span class="nc" id="L165">                pets = petRepository.findBySpeciesAndGenderAndStatus(species, gender, status);</span>
+            }
+            // Caso 7: Especie, Ubicación
+<span class="pc bpc" id="L168" title="1 of 4 branches missed.">            else if (species != null &amp;&amp; location != null) {</span>
+<span class="nc" id="L169">                pets = petRepository.findBySpeciesAndLocationAndStatus(species, location, status);</span>
+            }
+            // Caso 8: Especie, Edad
+<span class="pc bpc" id="L172" title="1 of 4 branches missed.">            else if (species != null &amp;&amp; age != null) {</span>
+<span class="nc" id="L173">                pets = petRepository.findBySpeciesAndAgeAndStatus(species, age, status);</span>
+            }
+            // Caso 9: Género, Ubicación
+<span class="pc bpc" id="L176" title="3 of 4 branches missed.">            else if (gender != null &amp;&amp; location != null) {</span>
+<span class="nc" id="L177">                pets = petRepository.findByGenderAndLocationAndStatus(gender, location, status);</span>
+            }
+            // Caso 10: Género, Edad
+<span class="pc bpc" id="L180" title="3 of 4 branches missed.">            else if (gender != null &amp;&amp; age != null) {</span>
+<span class="nc" id="L181">                pets = petRepository.findByGenderAndAgeAndStatus(gender, age, status);</span>
+            }
+            // Caso 11: Ubicación, Edad
+<span class="pc bpc" id="L184" title="3 of 4 branches missed.">            else if (location != null &amp;&amp; age != null) {</span>
+<span class="nc" id="L185">                pets = petRepository.findByLocationAndAgeAndStatus(location, age, status);</span>
+            }
+            // Caso 12: Solo Especie
+<span class="fc bfc" id="L188" title="All 2 branches covered.">            else if (species != null) {</span>
+<span class="fc" id="L189">                pets = petRepository.findBySpeciesAndStatus(species, status);</span>
+            }
+            // Caso 13: Solo Género
+<span class="pc bpc" id="L192" title="1 of 2 branches missed.">            else if (gender != null) {</span>
+<span class="nc" id="L193">                pets = petRepository.findByGenderAndStatus(gender, status);</span>
+            }
+            // Caso 14: Solo Ubicación
+<span class="pc bpc" id="L196" title="1 of 2 branches missed.">            else if (location != null) {</span>
+<span class="nc" id="L197">                pets = petRepository.findByLocationAndStatus(location, status);</span>
+            }
+            // Caso 15: Solo Edad
+<span class="pc bpc" id="L200" title="1 of 2 branches missed.">            else if (age != null) {</span>
+<span class="nc" id="L201">                pets = petRepository.findByAgeAndStatus(age, status);</span>
+            }
+            // Caso 16: Solo Status (disponibles)
+            else {
+<span class="fc" id="L205">                pets = petRepository.findByStatus(status);</span>
+            }
+
+<span class="fc" id="L208">            return ResponseEntity.ok(pets);</span>
+<span class="fc" id="L209">        } catch (Exception e) {</span>
+<span class="fc" id="L210">            return ResponseEntity.internalServerError().build();</span>
+        }
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.14.202510111229</span></div></body></html>

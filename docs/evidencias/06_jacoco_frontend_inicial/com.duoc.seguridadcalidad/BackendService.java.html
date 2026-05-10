@@ -1,0 +1,339 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>BackendService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">seguridadcalidad</a> &gt; <a href="index.source.html" class="el_package">com.duoc.seguridadcalidad</a> &gt; <span class="el_source">BackendService.java</span></div><h1>BackendService.java</h1><pre class="source lang-java linenums">package com.duoc.seguridadcalidad;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
+import org.springframework.web.util.UriComponentsBuilder;
+import org.springframework.web.client.HttpStatusCodeException;
+import org.springframework.web.client.RestTemplate;
+
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+
+@Service
+public class BackendService {
+
+<span class="fc" id="L23">    private static final Logger log = LoggerFactory.getLogger(BackendService.class);</span>
+
+    private final RestTemplate restTemplate;
+    private final String backendBaseUrl;
+
+<span class="fc" id="L28">    public BackendService(RestTemplate restTemplate, @Value(&quot;${backend.base-url}&quot;) String backendBaseUrl) {</span>
+<span class="fc" id="L29">        this.restTemplate = restTemplate;</span>
+<span class="fc" id="L30">        this.backendBaseUrl = backendBaseUrl;</span>
+<span class="fc" id="L31">    }</span>
+
+    public AuthResponse login(AuthRequest authRequest) {
+<span class="fc" id="L34">        log.debug(&quot;-&gt; BackendService.login payload={}&quot;, authRequest);</span>
+        try {
+<span class="fc" id="L36">            ResponseEntity&lt;String&gt; response = restTemplate.postForEntity(backendBaseUrl + &quot;/login&quot;, authRequest, String.class);</span>
+<span class="fc" id="L37">            log.debug(&quot;Backend login response status={} body={}&quot;, response.getStatusCode(), response.getBody());</span>
+<span class="fc" id="L38">            String token = response.getBody();</span>
+<span class="pc bpc" id="L39" title="1 of 4 branches missed.">            if (token != null &amp;&amp; token.startsWith(&quot;Bearer &quot;)) {</span>
+<span class="fc" id="L40">                token = token.substring(7);</span>
+            }
+<span class="fc" id="L42">            log.debug(&quot;&lt;- BackendService.login token={}&quot;, token);</span>
+<span class="fc" id="L43">            return new AuthResponse(token);</span>
+<span class="nc" id="L44">        } catch (HttpStatusCodeException ex) {</span>
+<span class="nc" id="L45">            log.error(&quot;Backend login failed status={} body={}&quot;, ex.getStatusCode(), ex.getResponseBodyAsString());</span>
+<span class="nc" id="L46">            throw ex;</span>
+        }
+    }
+
+    public List&lt;Map&lt;String, Object&gt;&gt; getPets(String jwtToken) {
+<span class="fc" id="L51">        HttpHeaders headers = new HttpHeaders();</span>
+<span class="fc" id="L52">        headers.set(&quot;Authorization&quot;, &quot;Bearer &quot; + jwtToken);</span>
+<span class="fc" id="L53">        HttpEntity&lt;Void&gt; entity = new HttpEntity&lt;&gt;(headers);</span>
+
+<span class="fc" id="L55">        log.debug(&quot;-&gt; BackendService.getPets Authorization={}&quot;, jwtToken);</span>
+        try {
+<span class="fc" id="L57">            ResponseEntity&lt;Map[]&gt; response = restTemplate.exchange(</span>
+                    backendBaseUrl + &quot;/pets&quot;,
+                    HttpMethod.GET,
+                    entity,
+                    Map[].class
+            );
+<span class="fc" id="L63">            log.debug(&quot;&lt;- BackendService.getPets status={} body={}&quot;, response.getStatusCode(), Arrays.toString(response.getBody()));</span>
+<span class="pc bpc" id="L64" title="1 of 2 branches missed.">            if (response.getBody() == null) {</span>
+<span class="fc" id="L65">                return Collections.emptyList();</span>
+            }
+<span class="nc" id="L67">            return Arrays.asList(response.getBody());</span>
+<span class="nc" id="L68">        } catch (HttpStatusCodeException ex) {</span>
+<span class="nc" id="L69">            log.error(&quot;Backend getPets failed status={} body={}&quot;, ex.getStatusCode(), ex.getResponseBodyAsString());</span>
+<span class="nc" id="L70">            throw ex;</span>
+        }
+    }
+
+    public List&lt;Map&lt;String, Object&gt;&gt; getPatients(String jwtToken) {
+<span class="fc" id="L75">        HttpHeaders headers = new HttpHeaders();</span>
+<span class="fc" id="L76">        headers.set(&quot;Authorization&quot;, &quot;Bearer &quot; + jwtToken);</span>
+<span class="fc" id="L77">        HttpEntity&lt;Void&gt; entity = new HttpEntity&lt;&gt;(headers);</span>
+
+<span class="fc" id="L79">        log.debug(&quot;-&gt; BackendService.getPatients Authorization={}&quot;, jwtToken);</span>
+        try {
+<span class="fc" id="L81">            ResponseEntity&lt;Map[]&gt; response = restTemplate.exchange(</span>
+                    backendBaseUrl + &quot;/patients&quot;,
+                    HttpMethod.GET,
+                    entity,
+                    Map[].class
+            );
+<span class="fc" id="L87">            log.debug(&quot;&lt;- BackendService.getPatients status={} body={}&quot;, response.getStatusCode(), Arrays.toString(response.getBody()));</span>
+<span class="pc bpc" id="L88" title="1 of 2 branches missed.">            if (response.getBody() == null) {</span>
+<span class="fc" id="L89">                return Collections.emptyList();</span>
+            }
+<span class="nc" id="L91">            return Arrays.asList(response.getBody());</span>
+<span class="nc" id="L92">        } catch (HttpStatusCodeException ex) {</span>
+<span class="nc" id="L93">            log.error(&quot;Backend getPatients failed status={} body={}&quot;, ex.getStatusCode(), ex.getResponseBodyAsString());</span>
+<span class="nc" id="L94">            throw ex;</span>
+        }
+    }
+
+    public Map&lt;String, Object&gt; createPatient(String jwtToken, Map&lt;String, Object&gt; patient) {
+<span class="fc" id="L99">        HttpHeaders headers = new HttpHeaders();</span>
+<span class="fc" id="L100">        headers.setBearerAuth(jwtToken);</span>
+<span class="fc" id="L101">        HttpEntity&lt;Map&lt;String, Object&gt;&gt; entity = new HttpEntity&lt;&gt;(patient, headers);</span>
+
+<span class="fc" id="L103">        log.debug(&quot;-&gt; BackendService.createPatient Authorization=Bearer {} patient={}&quot;, jwtToken, patient);</span>
+        try {
+<span class="fc" id="L105">            Map response = restTemplate.postForObject(backendBaseUrl + &quot;/patients&quot;, entity, Map.class);</span>
+<span class="fc" id="L106">            log.debug(&quot;&lt;- BackendService.createPatient response={}&quot;, response);</span>
+<span class="fc" id="L107">            return response;</span>
+<span class="nc" id="L108">        } catch (HttpStatusCodeException ex) {</span>
+<span class="nc" id="L109">            log.error(&quot;Backend createPatient failed status={} body={}&quot;, ex.getStatusCode(), ex.getResponseBodyAsString());</span>
+<span class="nc" id="L110">            throw ex;</span>
+        }
+    }
+
+    public Map&lt;String, Object&gt; getPatientById(String jwtToken, Long id) {
+<span class="fc" id="L115">        HttpHeaders headers = new HttpHeaders();</span>
+<span class="fc" id="L116">        headers.setBearerAuth(jwtToken);</span>
+<span class="fc" id="L117">        HttpEntity&lt;Void&gt; entity = new HttpEntity&lt;&gt;(headers);</span>
+
+<span class="fc" id="L119">        log.debug(&quot;-&gt; BackendService.getPatientById id={} Authorization=Bearer {}&quot;, id, jwtToken);</span>
+        try {
+<span class="nc" id="L121">            ResponseEntity&lt;Map&gt; response = restTemplate.exchange(</span>
+                    backendBaseUrl + &quot;/patients/&quot; + id,
+                    HttpMethod.GET,
+                    entity,
+                    Map.class
+            );
+<span class="nc" id="L127">            log.debug(&quot;&lt;- BackendService.getPatientById status={} body={}&quot;, response.getStatusCode(), response.getBody());</span>
+<span class="nc" id="L128">            return response.getBody();</span>
+<span class="fc" id="L129">        } catch (HttpStatusCodeException ex) {</span>
+<span class="fc" id="L130">            log.error(&quot;Backend getPatientById failed status={} body={}&quot;, ex.getStatusCode(), ex.getResponseBodyAsString());</span>
+<span class="pc bpc" id="L131" title="1 of 2 branches missed.">            if (ex.getStatusCode().value() == 404) {</span>
+<span class="fc" id="L132">                return null;</span>
+            }
+<span class="nc" id="L134">            throw ex;</span>
+        }
+    }
+
+    public Map&lt;String, Object&gt; updatePatient(String jwtToken, Long id, Map&lt;String, Object&gt; patient) {
+<span class="fc" id="L139">        HttpHeaders headers = new HttpHeaders();</span>
+<span class="fc" id="L140">        headers.setBearerAuth(jwtToken);</span>
+<span class="fc" id="L141">        HttpEntity&lt;Map&lt;String, Object&gt;&gt; entity = new HttpEntity&lt;&gt;(patient, headers);</span>
+
+<span class="fc" id="L143">        log.debug(&quot;-&gt; BackendService.updatePatient id={} Authorization=Bearer {} patient={}&quot;, id, jwtToken, patient);</span>
+        try {
+<span class="fc" id="L145">            ResponseEntity&lt;Map&gt; response = restTemplate.exchange(</span>
+                    backendBaseUrl + &quot;/patients/&quot; + id,
+                    HttpMethod.PUT,
+                    entity,
+                    Map.class
+            );
+<span class="fc" id="L151">            log.debug(&quot;&lt;- BackendService.updatePatient status={} body={}&quot;, response.getStatusCode(), response.getBody());</span>
+<span class="fc" id="L152">            return response.getBody();</span>
+<span class="nc" id="L153">        } catch (HttpStatusCodeException ex) {</span>
+<span class="nc" id="L154">            log.error(&quot;Backend updatePatient failed status={} body={}&quot;, ex.getStatusCode(), ex.getResponseBodyAsString());</span>
+<span class="nc" id="L155">            throw ex;</span>
+        }
+    }
+
+    public void deletePatient(String jwtToken, Long id) {
+<span class="fc" id="L160">        HttpHeaders headers = new HttpHeaders();</span>
+<span class="fc" id="L161">        headers.setBearerAuth(jwtToken);</span>
+<span class="fc" id="L162">        HttpEntity&lt;Void&gt; entity = new HttpEntity&lt;&gt;(headers);</span>
+
+<span class="fc" id="L164">        log.debug(&quot;-&gt; BackendService.deletePatient id={} Authorization=Bearer {}&quot;, id, jwtToken);</span>
+<span class="fc" id="L165">        restTemplate.exchange(</span>
+                backendBaseUrl + &quot;/patients/&quot; + id,
+                HttpMethod.DELETE,
+                entity,
+                Void.class
+        );
+<span class="fc" id="L171">    }</span>
+
+    public Map&lt;String, Object&gt; createPet(String jwtToken, Map&lt;String, Object&gt; pet) {
+<span class="fc" id="L174">        HttpHeaders headers = new HttpHeaders();</span>
+<span class="fc" id="L175">        headers.set(&quot;Authorization&quot;, &quot;Bearer &quot; + jwtToken);</span>
+<span class="fc" id="L176">        HttpEntity&lt;Map&lt;String, Object&gt;&gt; entity = new HttpEntity&lt;&gt;(pet, headers);</span>
+
+<span class="fc" id="L178">        log.debug(&quot;-&gt; BackendService.createPet Authorization={} pet={}&quot;, jwtToken, pet);</span>
+        try {
+<span class="fc" id="L180">            Map response = restTemplate.postForObject(backendBaseUrl + &quot;/pets&quot;, entity, Map.class);</span>
+<span class="fc" id="L181">            log.debug(&quot;&lt;- BackendService.createPet response={}&quot;, response);</span>
+<span class="fc" id="L182">            return response;</span>
+<span class="nc" id="L183">        } catch (HttpStatusCodeException ex) {</span>
+<span class="nc" id="L184">            log.error(&quot;Backend createPet failed status={} body={}&quot;, ex.getStatusCode(), ex.getResponseBodyAsString());</span>
+<span class="nc" id="L185">            throw ex;</span>
+        }
+    }
+
+public List&lt;Map&lt;String, Object&gt;&gt; getAppointments(String jwtToken) {
+<span class="fc" id="L190">        HttpHeaders headers = new HttpHeaders();</span>
+<span class="fc" id="L191">        headers.set(&quot;Authorization&quot;, &quot;Bearer &quot; + jwtToken);        HttpEntity&lt;Void&gt; entity = new HttpEntity&lt;&gt;(headers);</span>
+<span class="fc" id="L192">        log.debug(&quot;-&gt; BackendService.getAppointments Authorization={}&quot;, jwtToken);</span>
+        try {
+<span class="fc" id="L194">            ResponseEntity&lt;Map[]&gt; response = restTemplate.exchange(</span>
+                    backendBaseUrl + &quot;/appointments&quot;,
+                    HttpMethod.GET,
+                    entity,
+                    Map[].class
+            );
+<span class="fc" id="L200">            log.debug(&quot;&lt;- BackendService.getAppointments status={} body={}&quot;, response.getStatusCode(), Arrays.toString(response.getBody()));</span>
+<span class="pc bpc" id="L201" title="1 of 2 branches missed.">            if (response.getBody() == null) {</span>
+<span class="fc" id="L202">                return Collections.emptyList();</span>
+            }
+<span class="nc" id="L204">            return Arrays.asList(response.getBody());</span>
+<span class="nc" id="L205">        } catch (HttpStatusCodeException ex) {</span>
+<span class="nc" id="L206">            log.error(&quot;Backend getAppointments failed status={} body={}&quot;, ex.getStatusCode(), ex.getResponseBodyAsString());</span>
+<span class="nc" id="L207">            throw ex;</span>
+        }
+    }
+
+    public Map&lt;String, Object&gt; createAppointment(String jwtToken, Map&lt;String, Object&gt; appointment) {
+<span class="fc" id="L212">        HttpHeaders headers = new HttpHeaders();</span>
+<span class="fc" id="L213">        headers.setBearerAuth(jwtToken);</span>
+<span class="fc" id="L214">        HttpEntity&lt;Map&lt;String, Object&gt;&gt; entity = new HttpEntity&lt;&gt;(appointment, headers);</span>
+
+<span class="fc" id="L216">        log.debug(&quot;-&gt; BackendService.createAppointment Authorization=Bearer {} appointment={}&quot;, jwtToken, appointment);</span>
+        try {
+<span class="fc" id="L218">            Map response = restTemplate.postForObject(backendBaseUrl + &quot;/appointments&quot;, entity, Map.class);</span>
+<span class="fc" id="L219">            log.debug(&quot;&lt;- BackendService.createAppointment response={}&quot;, response);</span>
+<span class="fc" id="L220">            return response;</span>
+<span class="nc" id="L221">        } catch (HttpStatusCodeException ex) {</span>
+<span class="nc" id="L222">            log.error(&quot;Backend createAppointment failed status={} body={}&quot;, ex.getStatusCode(), ex.getResponseBodyAsString());</span>
+<span class="nc" id="L223">            throw ex;</span>
+        }
+    }
+
+    public List&lt;Map&lt;String, Object&gt;&gt; getPets() {
+<span class="fc" id="L228">        log.debug(&quot;-&gt; BackendService.getPets&quot;);</span>
+        try {
+<span class="fc" id="L230">            ResponseEntity&lt;Map[]&gt; response = restTemplate.exchange(</span>
+                    backendBaseUrl + &quot;/pets&quot;,
+                    HttpMethod.GET,
+                    null,
+                    Map[].class
+            );
+<span class="fc" id="L236">            log.debug(&quot;&lt;- BackendService.getPets status={} body={}&quot;, response.getStatusCode(), Arrays.toString(response.getBody()));</span>
+<span class="pc bpc" id="L237" title="1 of 2 branches missed.">            if (response.getBody() == null) {</span>
+<span class="nc" id="L238">                return Collections.emptyList();</span>
+            }
+<span class="fc" id="L240">            return Arrays.asList(response.getBody());</span>
+<span class="nc" id="L241">        } catch (HttpStatusCodeException ex) {</span>
+<span class="nc" id="L242">            log.error(&quot;Backend getPets failed status={} body={}&quot;, ex.getStatusCode(), ex.getResponseBodyAsString());</span>
+<span class="nc" id="L243">            throw ex;</span>
+        }
+    }
+
+    public List&lt;Map&lt;String, Object&gt;&gt; getAvailablePets() {
+<span class="fc" id="L248">        log.debug(&quot;-&gt; BackendService.getAvailablePets&quot;);</span>
+        try {
+<span class="fc" id="L250">            ResponseEntity&lt;Map[]&gt; response = restTemplate.exchange(</span>
+                    backendBaseUrl + &quot;/pets/available&quot;,
+                    HttpMethod.GET,
+                    null,
+                    Map[].class
+            );
+<span class="fc" id="L256">            log.debug(&quot;&lt;- BackendService.getAvailablePets status={} body={}&quot;, response.getStatusCode(), Arrays.toString(response.getBody()));</span>
+<span class="pc bpc" id="L257" title="1 of 2 branches missed.">            if (response.getBody() == null) {</span>
+<span class="fc" id="L258">                return Collections.emptyList();</span>
+            }
+<span class="nc" id="L260">            return Arrays.asList(response.getBody());</span>
+<span class="nc" id="L261">        } catch (HttpStatusCodeException ex) {</span>
+<span class="nc" id="L262">            log.error(&quot;Backend getAvailablePets failed status={} body={}&quot;, ex.getStatusCode(), ex.getResponseBodyAsString());</span>
+<span class="nc" id="L263">            throw ex;</span>
+        }
+    }
+
+    public List&lt;Map&lt;String, Object&gt;&gt; searchPets(String species, String gender, String location, Integer age, String status) {
+<span class="fc" id="L268">        String uri = UriComponentsBuilder</span>
+<span class="fc" id="L269">            .fromUriString(backendBaseUrl + &quot;/pets/search&quot;)</span>
+<span class="fc" id="L270">                .queryParamIfPresent(&quot;species&quot;, java.util.Optional.ofNullable(species))</span>
+<span class="fc" id="L271">                .queryParamIfPresent(&quot;gender&quot;, java.util.Optional.ofNullable(gender))</span>
+<span class="fc" id="L272">                .queryParamIfPresent(&quot;location&quot;, java.util.Optional.ofNullable(location))</span>
+<span class="fc" id="L273">                .queryParamIfPresent(&quot;age&quot;, java.util.Optional.ofNullable(age))</span>
+<span class="fc" id="L274">                .queryParamIfPresent(&quot;status&quot;, java.util.Optional.ofNullable(status))</span>
+<span class="fc" id="L275">                .build()</span>
+<span class="fc" id="L276">                .toUriString();</span>
+
+<span class="fc" id="L278">        log.debug(&quot;-&gt; BackendService.searchPets uri={}&quot;, uri);</span>
+        try {
+<span class="fc" id="L280">            ResponseEntity&lt;Map[]&gt; response = restTemplate.exchange(</span>
+                    uri,
+                    HttpMethod.GET,
+                    null,
+                    Map[].class
+            );
+<span class="fc" id="L286">            log.debug(&quot;&lt;- BackendService.searchPets status={} body={}&quot;, response.getStatusCode(), Arrays.toString(response.getBody()));</span>
+<span class="pc bpc" id="L287" title="1 of 2 branches missed.">            if (response.getBody() == null) {</span>
+<span class="nc" id="L288">                return Collections.emptyList();</span>
+            }
+<span class="fc" id="L290">            return Arrays.asList(response.getBody());</span>
+<span class="nc" id="L291">        } catch (HttpStatusCodeException ex) {</span>
+<span class="nc" id="L292">            log.error(&quot;Backend searchPets failed status={} body={}&quot;, ex.getStatusCode(), ex.getResponseBodyAsString());</span>
+<span class="nc" id="L293">            throw ex;</span>
+        }
+    }
+
+    public Map&lt;String, Object&gt; updatePet(String jwtToken, Integer id, Map&lt;String, Object&gt; pet) {
+<span class="fc" id="L298">        HttpHeaders headers = new HttpHeaders();</span>
+<span class="fc" id="L299">        headers.setBearerAuth(jwtToken);</span>
+<span class="fc" id="L300">        HttpEntity&lt;Map&lt;String, Object&gt;&gt; entity = new HttpEntity&lt;&gt;(pet, headers);</span>
+
+<span class="fc" id="L302">        log.debug(&quot;-&gt; BackendService.updatePet Authorization=Bearer {} id={} pet={}&quot;, jwtToken, id, pet);</span>
+        try {
+<span class="fc" id="L304">            ResponseEntity&lt;Map&gt; response = restTemplate.exchange(</span>
+                    backendBaseUrl + &quot;/pets/&quot; + id,
+                    HttpMethod.PUT,
+                    entity,
+                    Map.class
+            );
+<span class="fc" id="L310">            log.debug(&quot;&lt;- BackendService.updatePet status={} body={}&quot;, response.getStatusCode(), response.getBody());</span>
+<span class="fc" id="L311">            return response.getBody();</span>
+<span class="nc" id="L312">        } catch (HttpStatusCodeException ex) {</span>
+<span class="nc" id="L313">            log.error(&quot;Backend updatePet failed status={} body={}&quot;, ex.getStatusCode(), ex.getResponseBodyAsString());</span>
+<span class="nc" id="L314">            throw ex;</span>
+        }
+    }
+
+    public Map&lt;String, Object&gt; deletePet(String jwtToken, Integer id) {
+<span class="fc" id="L319">        HttpHeaders headers = new HttpHeaders();</span>
+<span class="fc" id="L320">        headers.setBearerAuth(jwtToken);</span>
+<span class="fc" id="L321">        HttpEntity&lt;Void&gt; entity = new HttpEntity&lt;&gt;(headers);</span>
+
+<span class="fc" id="L323">        log.debug(&quot;-&gt; BackendService.deletePet Authorization=Bearer {} id={}&quot;, jwtToken, id);</span>
+        try {
+<span class="fc" id="L325">            ResponseEntity&lt;Map&gt; response = restTemplate.exchange(</span>
+                    backendBaseUrl + &quot;/pets/&quot; + id,
+                    HttpMethod.DELETE,
+                    entity,
+                    Map.class
+            );
+<span class="fc" id="L331">            log.debug(&quot;&lt;- BackendService.deletePet status={} body={}&quot;, response.getStatusCode(), response.getBody());</span>
+<span class="fc" id="L332">            return response.getBody();</span>
+<span class="nc" id="L333">        } catch (HttpStatusCodeException ex) {</span>
+<span class="nc" id="L334">            log.error(&quot;Backend deletePet failed status={} body={}&quot;, ex.getStatusCode(), ex.getResponseBodyAsString());</span>
+<span class="nc" id="L335">            throw ex;</span>
+        }
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.14.202510111229</span></div></body></html>

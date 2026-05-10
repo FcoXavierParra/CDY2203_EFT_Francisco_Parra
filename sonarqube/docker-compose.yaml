@@ -1,0 +1,54 @@
+# SAST stack: Jenkins (CI) + SonarQube (analizador estatico)
+# Basado en guia Exp2_S4. Cambios respecto al template original:
+#   - Jenkins host port 8090 (8080 esta ocupado por el frontend)
+#   - SonarQube fijado a lts-community (H2 embebido OK para evaluacion)
+#   - Volumenes persistidos para no reinstalar plugins en cada reinicio
+# Uso:
+#   docker-compose up -d
+#   Jenkins:    http://localhost:8090
+#   SonarQube:  http://localhost:9000   (admin/admin la primera vez)
+
+name: cdy2203-sast
+
+services:
+  jenkins:
+    container_name: jenkins
+    image: jenkins/jenkins:lts
+    ports:
+      - "8090:8080"
+      - "50000:50000"
+    volumes:
+      - jenkins_home:/var/jenkins_home
+    environment:
+      - JENKINS_SLAVE_AGENT_PORT=50000
+    networks:
+      - sast_net
+    restart: unless-stopped
+
+  sonarqube:
+    container_name: sonarqube
+    image: sonarqube:lts-community
+    ports:
+      - "9000:9000"
+    volumes:
+      - sonarqube_data:/opt/sonarqube/data
+      - sonarqube_extensions:/opt/sonarqube/extensions
+      - sonarqube_logs:/opt/sonarqube/logs
+    environment:
+      - SONAR_ES_BOOTSTRAP_CHECKS_DISABLE=true
+    networks:
+      - sast_net
+    restart: unless-stopped
+    # SonarQube necesita vm.max_map_count >= 262144 en el host.
+    # En Docker Desktop (Windows/Mac) esto ya viene configurado;
+    # si fallara el arranque en Linux: sudo sysctl -w vm.max_map_count=262144
+
+networks:
+  sast_net:
+    driver: bridge
+
+volumes:
+  jenkins_home:
+  sonarqube_data:
+  sonarqube_extensions:
+  sonarqube_logs:

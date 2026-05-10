@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Pet.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">backend</a> &gt; <a href="index.source.html" class="el_package">com.duoc.backend</a> &gt; <span class="el_source">Pet.java</span></div><h1>Pet.java</h1><pre class="source lang-java linenums">package com.duoc.backend;
+
+import jakarta.persistence.ElementCollection;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.CollectionTable;
+import jakarta.persistence.Column;
+import java.util.List;
+
+@Entity
+public class Pet {
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Long id;
+
+    private String name;
+    private String species;
+    private String breed;
+    private Integer age;
+    private String gender;
+    private String location;
+
+    @ElementCollection
+    @CollectionTable(name = &quot;pet_photos&quot;)
+    @Column(name = &quot;photo_url&quot;)
+    private List&lt;String&gt; photos;
+
+    private String status; // available, adopted, etc.
+
+    // Constructors
+<span class="fc" id="L33">    public Pet() {}</span>
+
+<span class="fc" id="L35">    public Pet(String name, String species, String breed, Integer age, String gender, String location, List&lt;String&gt; photos) {</span>
+<span class="fc" id="L36">        this.name = name;</span>
+<span class="fc" id="L37">        this.species = species;</span>
+<span class="fc" id="L38">        this.breed = breed;</span>
+<span class="fc" id="L39">        this.age = age;</span>
+<span class="fc" id="L40">        this.gender = gender;</span>
+<span class="fc" id="L41">        this.location = location;</span>
+<span class="fc" id="L42">        this.photos = photos;</span>
+<span class="fc" id="L43">        this.status = &quot;available&quot;;</span>
+<span class="fc" id="L44">    }</span>
+
+    // Getters and Setters
+    public Long getId() {
+<span class="fc" id="L48">        return id;</span>
+    }
+
+    public void setId(Long id) {
+<span class="fc" id="L52">        this.id = id;</span>
+<span class="fc" id="L53">    }</span>
+
+    public String getName() {
+<span class="fc" id="L56">        return name;</span>
+    }
+
+    public void setName(String name) {
+<span class="fc" id="L60">        this.name = name;</span>
+<span class="fc" id="L61">    }</span>
+
+    public String getSpecies() {
+<span class="fc" id="L64">        return species;</span>
+    }
+
+    public void setSpecies(String species) {
+<span class="fc" id="L68">        this.species = species;</span>
+<span class="fc" id="L69">    }</span>
+
+    public String getBreed() {
+<span class="fc" id="L72">        return breed;</span>
+    }
+
+    public void setBreed(String breed) {
+<span class="nc" id="L76">        this.breed = breed;</span>
+<span class="nc" id="L77">    }</span>
+
+    public Integer getAge() {
+<span class="fc" id="L80">        return age;</span>
+    }
+
+    public void setAge(Integer age) {
+<span class="nc" id="L84">        this.age = age;</span>
+<span class="nc" id="L85">    }</span>
+
+    public String getGender() {
+<span class="fc" id="L88">        return gender;</span>
+    }
+
+    public void setGender(String gender) {
+<span class="nc" id="L92">        this.gender = gender;</span>
+<span class="nc" id="L93">    }</span>
+
+    public String getLocation() {
+<span class="fc" id="L96">        return location;</span>
+    }
+
+    public void setLocation(String location) {
+<span class="fc" id="L100">        this.location = location;</span>
+<span class="fc" id="L101">    }</span>
+
+    public List&lt;String&gt; getPhotos() {
+<span class="fc" id="L104">        return photos;</span>
+    }
+
+    public void setPhotos(List&lt;String&gt; photos) {
+<span class="nc" id="L108">        this.photos = photos;</span>
+<span class="nc" id="L109">    }</span>
+
+    public String getStatus() {
+<span class="fc" id="L112">        return status;</span>
+    }
+
+    public void setStatus(String status) {
+<span class="fc" id="L116">        this.status = status;</span>
+<span class="fc" id="L117">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.14.202510111229</span></div></body></html>

@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>WebSecurityConfig.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">seguridadcalidad</a> &gt; <a href="index.source.html" class="el_package">com.duoc.seguridadcalidad</a> &gt; <span class="el_source">WebSecurityConfig.java</span></div><h1>WebSecurityConfig.java</h1><pre class="source lang-java linenums">package com.duoc.seguridadcalidad;
+
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Description;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.provisioning.InMemoryUserDetailsManager;
+import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
+import org.springframework.web.client.RestTemplate;
+
+@Configuration
+@EnableWebSecurity
+<span class="fc" id="L23">public class WebSecurityConfig {</span>
+
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+<span class="fc" id="L27">        http</span>
+<span class="fc" id="L28">            .csrf(csrf -&gt; csrf.disable())</span>
+<span class="fc" id="L29">            .sessionManagement(session -&gt; session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))</span>
+<span class="fc" id="L30">            .headers(headers -&gt; headers</span>
+<span class="fc" id="L31">                .contentSecurityPolicy(csp -&gt; csp.policyDirectives(</span>
+                    &quot;default-src 'self'; &quot; +
+                    &quot;script-src 'self' 'unsafe-inline'; &quot; +
+                    &quot;style-src 'self' 'unsafe-inline'; &quot; +
+                    &quot;img-src 'self' data: https:; &quot; +
+                    &quot;font-src 'self' data:; &quot; +
+                    &quot;connect-src 'self' http://localhost:8081; &quot; +
+                    &quot;object-src 'none'; &quot; +
+                    &quot;frame-src 'none'; &quot; +
+                    &quot;child-src 'none'; &quot; +
+                    &quot;worker-src 'self' blob:; &quot; +
+                    &quot;manifest-src 'self'; &quot; +
+                    &quot;media-src 'self'; &quot; +
+                    &quot;frame-ancestors 'none'; &quot; +
+                    &quot;base-uri 'self'; &quot; +
+                    &quot;form-action 'self'&quot;
+                ))
+            )
+<span class="fc" id="L49">            .authorizeHttpRequests(requests -&gt; requests</span>
+<span class="fc" id="L50">                .requestMatchers(&quot;/&quot;, &quot;/home&quot;, &quot;/login&quot;, &quot;/css/**&quot;, &quot;/**.css&quot;).permitAll()</span>
+<span class="fc" id="L51">                .requestMatchers(&quot;/pets&quot;, &quot;/api/auth/login&quot;, &quot;/api/auth/logout&quot;).permitAll()</span>
+<span class="fc" id="L52">                .requestMatchers(&quot;/api/pets&quot;, &quot;/api/pets/available&quot;, &quot;/api/pets/search&quot;).permitAll()</span>
+<span class="fc" id="L53">                .requestMatchers(&quot;/patients/**&quot;, &quot;/appointments/**&quot;, &quot;/pets/new&quot;).authenticated()</span>
+<span class="fc" id="L54">                .anyRequest().authenticated()</span>
+            )
+<span class="fc" id="L56">            .exceptionHandling(ex -&gt; ex.authenticationEntryPoint(new LoginUrlAuthenticationEntryPoint(&quot;/login&quot;)))</span>
+<span class="fc" id="L57">            .formLogin(form -&gt; form.disable())</span>
+<span class="fc" id="L58">            .logout(logout -&gt; logout</span>
+<span class="fc" id="L59">                .logoutUrl(&quot;/logout&quot;)</span>
+<span class="fc" id="L60">                .logoutSuccessUrl(&quot;/login&quot;)</span>
+            );
+
+<span class="fc" id="L63">        return http.build();</span>
+    }
+
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
+<span class="fc" id="L68">        return configuration.getAuthenticationManager();</span>
+    }
+
+    @Bean
+    public RestTemplate restTemplate() {
+<span class="fc" id="L73">        return new RestTemplate();</span>
+    }
+
+    @Bean
+    @Description(&quot;In memory Userdetails service registered since DB doesn't have user table&quot;)
+    public UserDetailsService users() {
+<span class="fc" id="L79">        UserDetails user = User.builder()</span>
+<span class="fc" id="L80">                .username(&quot;user&quot;)</span>
+<span class="fc" id="L81">                .password(passwordEncoder().encode(&quot;password&quot;))</span>
+<span class="fc" id="L82">                .roles(&quot;USER&quot;)</span>
+<span class="fc" id="L83">                .build();</span>
+
+<span class="fc" id="L85">        UserDetails admin = User.builder()</span>
+<span class="fc" id="L86">                .username(&quot;admin&quot;)</span>
+<span class="fc" id="L87">                .password(passwordEncoder().encode(&quot;password&quot;))</span>
+<span class="fc" id="L88">                .roles(&quot;USER&quot;, &quot;ADMIN&quot;)</span>
+<span class="fc" id="L89">                .build();</span>
+
+<span class="fc" id="L91">        UserDetails manager = User.builder()</span>
+<span class="fc" id="L92">                .username(&quot;manager&quot;)</span>
+<span class="fc" id="L93">                .password(passwordEncoder().encode(&quot;password&quot;))</span>
+<span class="fc" id="L94">                .roles(&quot;USER&quot;)</span>
+<span class="fc" id="L95">                .build();</span>
+
+<span class="fc" id="L97">        return new InMemoryUserDetailsManager(user, admin, manager);</span>
+    }
+
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+<span class="fc" id="L102">        return new BCryptPasswordEncoder();</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.14.202510111229</span></div></body></html>

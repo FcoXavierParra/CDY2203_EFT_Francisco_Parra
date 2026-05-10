@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="https://www.thymeleaf.org">
+    <head>
+        <title>Login con JWT</title>
+        <link rel="stylesheet" type="text/css" href="/login.css">
+    </head>
+    <body>
+        <div id="errorMessage" style="color:red;"></div>
+        <form id="loginForm">
+            <div><label> User Name : <input type="text" id="username" name="username" required/> </label></div>
+            <div><label> Password: <input type="password" id="password" name="password" required/> </label></div>
+            <div><input type="submit" value="Sign In"/></div>
+        </form>
+
+        <script>
+            async function doLogin(event) {
+                event.preventDefault();
+                const username = document.getElementById('username').value;
+                const password = document.getElementById('password').value;
+
+                try {
+                    const response = await fetch('/api/auth/login', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ username, password })
+                    });
+
+                    if (!response.ok) {
+                        const error = await response.text();
+                        document.getElementById('errorMessage').innerText = 'Login failed: ' + (error || response.statusText);
+                        return;
+                    }
+
+                    const data = await response.json();
+                    if (data.token) {
+                        localStorage.setItem('jwtToken', data.token);
+                        window.location.href = '/home';
+                    } else {
+                        document.getElementById('errorMessage').innerText = 'Login failed: Token no recibido.';
+                    }
+                } catch (err) {
+                    console.error('Login error', err);
+                    document.getElementById('errorMessage').innerText = 'Login error: ' + err.message;
+                }
+            }
+
+            document.getElementById('loginForm').addEventListener('submit', doLogin);
+        </script>
+    </body>
+</html>
+

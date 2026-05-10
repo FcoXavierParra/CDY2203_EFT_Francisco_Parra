@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AppointmentController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">backend</a> &gt; <a href="index.source.html" class="el_package">com.duoc.backend</a> &gt; <span class="el_source">AppointmentController.java</span></div><h1>AppointmentController.java</h1><pre class="source lang-java linenums">package com.duoc.backend;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Optional;
+
+@RestController
+@RequestMapping(&quot;/appointments&quot;)
+<span class="fc" id="L15">public class AppointmentController {</span>
+
+    @Autowired
+    private AppointmentRepository appointmentRepository;
+
+    @Autowired
+    private PatientRepository patientRepository;
+
+    @PostMapping
+    public ResponseEntity&lt;?&gt; createAppointment(@RequestBody Appointment appointment) {
+        try {
+<span class="pc bpc" id="L26" title="1 of 4 branches missed.">            if (appointment.getPatientId() == null || !patientRepository.existsById(appointment.getPatientId())) {</span>
+<span class="fc" id="L27">                return ResponseEntity.badRequest().body(&quot;Patient not found for patientId: &quot; + appointment.getPatientId());</span>
+            }
+<span class="fc" id="L29">            appointmentRepository.save(appointment);</span>
+<span class="fc" id="L30">            return ResponseEntity.status(HttpStatus.CREATED).body(appointment);</span>
+
+            //return ResponseEntity.ok(&quot;Appointment scheduled successfully&quot;);
+<span class="nc" id="L33">        } catch (Exception e) {</span>
+<span class="nc" id="L34">            Map&lt;String, String&gt; error = new HashMap&lt;&gt;();</span>
+<span class="nc" id="L35">            error.put(&quot;message&quot;, &quot;Error al registrar: &quot; + e.getMessage());</span>
+<span class="nc" id="L36">            return ResponseEntity.badRequest().body(error);</span>
+            //return ResponseEntity.badRequest().body(&quot;Error scheduling appointment: &quot; + e.getMessage());
+        }
+    }
+
+    @GetMapping
+    public ResponseEntity&lt;Iterable&lt;Appointment&gt;&gt; getAllAppointments() {
+        try {
+<span class="nc" id="L44">            List&lt;Appointment&gt; appointments = (List&lt;Appointment&gt;) appointmentRepository.findAll();</span>
+<span class="nc" id="L45">            return ResponseEntity.ok(appointments);</span>
+<span class="nc" id="L46">        } catch (Exception e) {</span>
+<span class="nc" id="L47">            return ResponseEntity.internalServerError().build();</span>
+        }
+    }
+
+    @GetMapping(&quot;/{id}&quot;)
+    public ResponseEntity&lt;Appointment&gt; getAppointmentById(@PathVariable Long id) {
+        try {
+<span class="fc" id="L54">            Optional&lt;Appointment&gt; appointment = appointmentRepository.findById(id);</span>
+<span class="fc" id="L55">            return appointment.map(ResponseEntity::ok).orElseGet(() -&gt; ResponseEntity.notFound().build());</span>
+<span class="nc" id="L56">        } catch (Exception e) {</span>
+<span class="nc" id="L57">            return ResponseEntity.internalServerError().build();</span>
+        }
+    }
+
+    @GetMapping(&quot;/patient/{patientId}&quot;)
+    public ResponseEntity&lt;List&lt;Appointment&gt;&gt; getAppointmentsForPatient(@PathVariable Long patientId) {
+        try {
+<span class="pc bpc" id="L64" title="1 of 2 branches missed.">            if (!patientRepository.existsById(patientId)) {</span>
+<span class="fc" id="L65">                return ResponseEntity.notFound().build();</span>
+            }
+<span class="nc" id="L67">            List&lt;Appointment&gt; appointments = appointmentRepository.findByPatientId(patientId);</span>
+<span class="nc" id="L68">            return ResponseEntity.ok(appointments);</span>
+<span class="nc" id="L69">        } catch (Exception e) {</span>
+<span class="nc" id="L70">            return ResponseEntity.internalServerError().build();</span>
+        }
+    }
+
+    @PutMapping(&quot;/{id}&quot;)
+    public ResponseEntity&lt;String&gt; updateAppointment(@PathVariable Long id, @RequestBody Appointment appointment) {
+        try {
+<span class="pc bpc" id="L77" title="1 of 2 branches missed.">            if (!appointmentRepository.existsById(id)) {</span>
+<span class="nc" id="L78">                return ResponseEntity.notFound().build();</span>
+            }
+<span class="pc bpc" id="L80" title="1 of 4 branches missed.">            if (appointment.getPatientId() == null || !patientRepository.existsById(appointment.getPatientId())) {</span>
+<span class="fc" id="L81">                return ResponseEntity.badRequest().body(&quot;Patient not found for patientId: &quot; + appointment.getPatientId());</span>
+            }
+<span class="fc" id="L83">            appointment.setId(id);</span>
+<span class="fc" id="L84">            appointmentRepository.save(appointment);</span>
+<span class="fc" id="L85">            return ResponseEntity.ok(&quot;Appointment updated successfully&quot;);</span>
+<span class="nc" id="L86">        } catch (Exception e) {</span>
+<span class="nc" id="L87">            return ResponseEntity.badRequest().body(&quot;Error updating appointment: &quot; + e.getMessage());</span>
+        }
+    }
+
+    @DeleteMapping(&quot;/{id}&quot;)
+    public ResponseEntity&lt;String&gt; deleteAppointment(@PathVariable Long id) {
+        try {
+<span class="pc bpc" id="L94" title="1 of 2 branches missed.">            if (!appointmentRepository.existsById(id)) {</span>
+<span class="nc" id="L95">                return ResponseEntity.notFound().build();</span>
+            }
+<span class="nc" id="L97">            appointmentRepository.deleteById(id);</span>
+<span class="nc" id="L98">            return ResponseEntity.ok(&quot;Appointment deleted successfully&quot;);</span>
+<span class="fc" id="L99">        } catch (Exception e) {</span>
+<span class="fc" id="L100">            return ResponseEntity.internalServerError().body(&quot;Error deleting appointment: &quot; + e.getMessage());</span>
+        }
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.14.202510111229</span></div></body></html>

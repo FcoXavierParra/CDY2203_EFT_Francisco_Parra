@@ -1,0 +1,76 @@
+# --- Build artefactos ---
+target/
+**/target/
+build/
+**/build/
+out/
+**/out/
+
+# --- Maven wrapper local repo (cada proyecto puede crearlo en .m2repo) ---
+.m2repo/
+**/.m2repo/
+
+# --- Logs ---
+logs/
+**/logs/
+*.log
+*.log.*.gz
+
+# --- IDE / OS ---
+.idea/
+*.iws
+*.iml
+*.ipr
+.vscode/
+.classpath
+.project
+.settings/
+.factorypath
+.apt_generated
+.springBeans
+.sts4-cache
+.DS_Store
+Thumbs.db
+
+# --- Backups y entregables comprimidos (NO subir al repo) ---
+*.zip
+*.rar
+*.7z
+*.tar
+*.tar.gz
+
+# --- Jenkins / SonarQube data dirs (creados al levantar dockers) ---
+sonarqube/jenkins_home/
+sonarqube/sonarqube_data/
+sonarqube/sonarqube_logs/
+sonarqube/sonarqube_extensions/
+
+# --- OpenVAS / Greenbone data dirs (si se montan en host) ---
+openvas/data/
+openvas/logs/
+
+# --- Reportes generados por herramientas (se regeneran on-demand) ---
+**/dependency-check-report.html
+**/dependency-check-report.json
+**/dependency-check-report.xml
+**/dependency-check-data/
+**/site/jacoco/
+**/jacoco.exec
+**/surefire-reports/
+
+# --- Secretos / claves (NO subir nunca) ---
+*.env
+.env*
+*.pem
+*.key
+*.crt
+*.p12
+**/keystore.p12
+**/truststore.p12
+**/application-local.properties
+**/application-secret.properties
+nvd_api_key.txt
+github_pat.txt
+
+# --- Maven wrapper jar (se descarga al ejecutar mvnw) ---
+**/.mvn/wrapper/maven-wrapper.jar

@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Appointment.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">seguridadcalidad</a> &gt; <a href="index.source.html" class="el_package">com.duoc.seguridadcalidad</a> &gt; <span class="el_source">Appointment.java</span></div><h1>Appointment.java</h1><pre class="source lang-java linenums">package com.duoc.seguridadcalidad;
+
+import java.time.LocalDate;
+import java.time.LocalTime;
+
+public class Appointment {
+    private Long id;
+    private Long petId;
+    private LocalDate date;
+    private LocalTime time;
+    private String reason;
+    private String veterinarian;
+
+<span class="fc" id="L14">    public Appointment() {</span>
+<span class="fc" id="L15">    }</span>
+
+<span class="nc" id="L17">    public Appointment(Long id, Long petId, LocalDate date, LocalTime time, String reason, String veterinarian) {</span>
+<span class="nc" id="L18">        this.id = id;</span>
+<span class="nc" id="L19">        this.petId = petId;</span>
+<span class="nc" id="L20">        this.date = date;</span>
+<span class="nc" id="L21">        this.time = time;</span>
+<span class="nc" id="L22">        this.reason = reason;</span>
+<span class="nc" id="L23">        this.veterinarian = veterinarian;</span>
+<span class="nc" id="L24">    }</span>
+
+    public Long getId() {
+<span class="fc" id="L27">        return id;</span>
+    }
+
+    public void setId(Long id) {
+<span class="fc" id="L31">        this.id = id;</span>
+<span class="fc" id="L32">    }</span>
+
+    public Long getPetId() {
+<span class="fc" id="L35">        return petId;</span>
+    }
+
+    public void setPetId(Long petId) {
+<span class="fc" id="L39">        this.petId = petId;</span>
+<span class="fc" id="L40">    }</span>
+
+    public LocalDate getDate() {
+<span class="fc" id="L43">        return date;</span>
+    }
+
+    public void setDate(LocalDate date) {
+<span class="fc" id="L47">        this.date = date;</span>
+<span class="fc" id="L48">    }</span>
+
+    public LocalTime getTime() {
+<span class="fc" id="L51">        return time;</span>
+    }
+
+    public void setTime(LocalTime time) {
+<span class="fc" id="L55">        this.time = time;</span>
+<span class="fc" id="L56">    }</span>
+
+    public String getReason() {
+<span class="fc" id="L59">        return reason;</span>
+    }
+
+    public void setReason(String reason) {
+<span class="fc" id="L63">        this.reason = reason;</span>
+<span class="fc" id="L64">    }</span>
+
+    public String getVeterinarian() {
+<span class="fc" id="L67">        return veterinarian;</span>
+    }
+
+    public void setVeterinarian(String veterinarian) {
+<span class="fc" id="L71">        this.veterinarian = veterinarian;</span>
+<span class="fc" id="L72">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.14.202510111229</span></div></body></html>
