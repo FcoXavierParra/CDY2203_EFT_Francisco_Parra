@@ -38,7 +38,7 @@ public class WebSecurityConfig {
                     "default-src 'self'; " +
                     "script-src 'self' 'unsafe-inline'; " +
                     "style-src 'self' 'unsafe-inline'; " +
-                    "img-src 'self' data: https:; " +
+                    "img-src 'self' data: https://placedog.net https://placekitten.com; " +
                     "font-src 'self' data:; " +
                     "connect-src 'self' http://localhost:8081; " +
                     "object-src 'none'; " +

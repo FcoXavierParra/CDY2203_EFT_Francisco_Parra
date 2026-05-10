@@ -1,0 +1,161 @@
+﻿Started by user FRANCISCO JAVIER PARRA ANDIA
+Running as SYSTEM
+Building in workspace /var/jenkins_home/workspace/sast-cdy2203-backend
+The recommended git tool is: NONE
+No credentials specified
+ > git rev-parse --resolve-git-dir /var/jenkins_home/workspace/sast-cdy2203-backend/.git # timeout=10
+Fetching changes from the remote Git repository
+ > git config remote.origin.url https://github.com/FcoXavierParra/CDY2203_EFT_Francisco_Parra.git # timeout=10
+Fetching upstream changes from https://github.com/FcoXavierParra/CDY2203_EFT_Francisco_Parra.git
+ > git --version # timeout=10
+ > git --version # 'git version 2.47.3'
+ > git fetch --tags --force --progress -- https://github.com/FcoXavierParra/CDY2203_EFT_Francisco_Parra.git +refs/heads/*:refs/remotes/origin/* # timeout=10
+ > git rev-parse refs/remotes/origin/main^{commit} # timeout=10
+Checking out Revision c2c4f9d893215403f1914dc6ba41e5962e5771ac (refs/remotes/origin/main)
+ > git config core.sparsecheckout # timeout=10
+ > git checkout -f c2c4f9d893215403f1914dc6ba41e5962e5771ac # timeout=10
+Commit message: "fix(SAST): resolver hotspot JWT y 10 literales duplicados (S1192)"
+ > git rev-list --no-walk c2c4f9d893215403f1914dc6ba41e5962e5771ac # timeout=10
+[sast-cdy2203-backend] $ /bin/sh -xe /tmp/jenkins2693659010910667816.sh
++ cd cdy2203-backend-2026-201-main/cdy2203-backend-2026-201-main
++ mvn -DskipTests -Ddependency-check.skip=true clean compile -Dmaven.repo.local=.m2repo
+[[1;34mINFO[m] Scanning for projects...
+[[1;34mINFO[m] 
+[[1;34mINFO[m] [1m--------------------------< [0;36mcom.duoc:backend[0;1m >--------------------------[m
+[[1;34mINFO[m] [1mBuilding backend 0.0.1-SNAPSHOT[m
+[[1;34mINFO[m]   from pom.xml
+[[1;34mINFO[m] [1m--------------------------------[ jar ]---------------------------------[m
+[[1;34mINFO[m] 
+[[1;34mINFO[m] [1m--- [0;32mclean:3.5.0:clean[m [1m(default-clean)[m @ [36mbackend[0;1m ---[m
+[[1;34mINFO[m] Deleting /var/jenkins_home/workspace/sast-cdy2203-backend/cdy2203-backend-2026-201-main/cdy2203-backend-2026-201-main/target
+[[1;34mINFO[m] 
+[[1;34mINFO[m] [1m--- [0;32mjacoco:0.8.14:prepare-agent[m [1m(prepare-agent)[m @ [36mbackend[0;1m ---[m
+[[1;34mINFO[m] argLine set to -javaagent:/var/jenkins_home/workspace/sast-cdy2203-backend/cdy2203-backend-2026-201-main/cdy2203-backend-2026-201-main/.m2repo/org/jacoco/org.jacoco.agent/0.8.14/org.jacoco.agent-0.8.14-runtime.jar=destfile=/var/jenkins_home/workspace/sast-cdy2203-backend/cdy2203-backend-2026-201-main/cdy2203-backend-2026-201-main/target/jacoco.exec
+[[1;34mINFO[m] 
+[[1;34mINFO[m] [1m--- [0;32mresources:3.3.1:resources[m [1m(default-resources)[m @ [36mbackend[0;1m ---[m
+[[1;34mINFO[m] Copying 1 resource from src/main/resources to target/classes
+[[1;34mINFO[m] Copying 0 resource from src/main/resources to target/classes
+[[1;34mINFO[m] 
+[[1;34mINFO[m] [1m--- [0;32mcompiler:3.14.1:compile[m [1m(default-compile)[m @ [36mbackend[0;1m ---[m
+[[1;34mINFO[m] Recompiling the module because of [1mchanged source code[m.
+[[1;34mINFO[m] Compiling 23 source files with javac [debug parameters release 21] to target/classes
+[[1;34mINFO[m] /var/jenkins_home/workspace/sast-cdy2203-backend/cdy2203-backend-2026-201-main/cdy2203-backend-2026-201-main/src/main/java/com/duoc/backend/User.java: Some input files use unchecked or unsafe operations.
+[[1;34mINFO[m] /var/jenkins_home/workspace/sast-cdy2203-backend/cdy2203-backend-2026-201-main/cdy2203-backend-2026-201-main/src/main/java/com/duoc/backend/User.java: Recompile with -Xlint:unchecked for details.
+[[1;34mINFO[m] [1m------------------------------------------------------------------------[m
+[[1;34mINFO[m] [1;32mBUILD SUCCESS[m
+[[1;34mINFO[m] [1m------------------------------------------------------------------------[m
+[[1;34mINFO[m] Total time:  4.912 s
+[[1;34mINFO[m] Finished at: 2026-05-10T18:50:37Z
+[[1;34mINFO[m] [1m------------------------------------------------------------------------[m
+[sast-cdy2203-backend] $ /var/jenkins_home/tools/hudson.plugins.sonar.SonarRunnerInstallation/sonarqube/bin/sonar-scanner -Dsonar.host.url=http://sonarqube:9000 ******** -Dsonar.projectKey=cdy2203-backend "-Dsonar.projectName=CDY2203 Backend" -Dsonar.java.source=21 -Dsonar.sources=cdy2203-backend-2026-201-main/cdy2203-backend-2026-201-main/src/main/java -Dsonar.java.binaries=cdy2203-backend-2026-201-main/cdy2203-backend-2026-201-main/target/classes -Dsonar.projectBaseDir=/var/jenkins_home/workspace/sast-cdy2203-backend
+18:50:38.764 INFO  Scanner configuration file: /var/jenkins_home/tools/hudson.plugins.sonar.SonarRunnerInstallation/sonarqube/conf/sonar-scanner.properties
+18:50:38.773 INFO  Project root configuration file: NONE
+18:50:38.815 INFO  SonarScanner CLI 8.1.0.6389
+18:50:38.826 INFO  Linux 6.6.87.2-microsoft-standard-WSL2 amd64
+18:50:45.186 INFO  Communicating with SonarQube Server 9.9.8.100196
+18:50:46.220 INFO  Load global settings
+18:50:46.387 INFO  Load global settings (done) | time=169ms
+18:50:46.392 INFO  Server id: 147B411E-AZ4OOJsHcT1V5Dh-UF4P
+18:50:46.409 INFO  User cache: /var/jenkins_home/.sonar/cache
+18:50:46.418 INFO  Load/download plugins
+18:50:46.418 INFO  Load plugins index
+18:50:46.507 INFO  Load plugins index (done) | time=89ms
+18:50:46.610 INFO  Load/download plugins (done) | time=192ms
+18:50:47.503 INFO  Process project properties
+18:50:47.518 INFO  Process project properties (done) | time=14ms
+18:50:47.523 INFO  Execute project builders
+18:50:47.525 INFO  Execute project builders (done) | time=2ms
+18:50:47.534 INFO  Project key: cdy2203-backend
+18:50:47.534 INFO  Base dir: /var/jenkins_home/workspace/sast-cdy2203-backend
+18:50:47.534 INFO  Working dir: /var/jenkins_home/workspace/sast-cdy2203-backend/.scannerwork
+18:50:47.550 INFO  Load project settings for component key: 'cdy2203-backend'
+18:50:47.580 INFO  Load project settings for component key: 'cdy2203-backend' (done) | time=30ms
+18:50:47.794 INFO  Auto-configuring with CI 'Jenkins'
+18:50:47.802 INFO  Load quality profiles
+18:50:47.872 INFO  Load quality profiles (done) | time=70ms
+18:50:47.897 INFO  Load active rules
+18:50:51.284 INFO  Load active rules (done) | time=3387ms
+18:50:51.296 INFO  Load analysis cache
+18:50:51.322 INFO  Load analysis cache (630 bytes) | time=26ms
+18:50:51.456 INFO  Load project repositories
+18:50:51.508 INFO  Load project repositories (done) | time=52ms
+18:50:51.622 INFO  Indexing files...
+18:50:51.625 INFO  Project configuration:
+18:50:52.171 INFO  23 files indexed
+18:50:52.172 INFO  0 files ignored because of scm ignore settings
+18:50:52.176 INFO  Quality profile for java: Sonar way
+18:50:52.176 INFO  ------------- Run sensors on module CDY2203 Backend
+18:50:52.360 INFO  Load metrics repository
+18:50:52.412 INFO  Load metrics repository (done) | time=52ms
+18:50:55.136 INFO  Sensor JavaSensor [java]
+18:50:55.147 INFO  Configured Java source version (sonar.java.source): 21
+18:50:55.155 INFO  JavaClasspath initialization
+18:50:55.160 INFO  JavaClasspath initialization (done) | time=6ms
+18:50:55.161 INFO  JavaTestClasspath initialization
+18:50:55.161 INFO  JavaTestClasspath initialization (done) | time=0ms
+18:50:55.177 INFO  Server-side caching is enabled. The Java analyzer will not try to leverage data from a previous analysis.
+18:50:55.183 INFO  Using ECJ batch to parse 23 Main java source files with batch size 99 KB.
+18:50:55.464 INFO  Starting batch processing.
+18:50:56.370 INFO  The Java analyzer cannot skip unchanged files in this context. A full analysis is performed for all files.
+18:50:59.749 INFO  100% analyzed
+18:50:59.750 INFO  Batch processing: Done.
+18:50:59.752 INFO  Did not optimize analysis for any files, performed a full analysis for all 23 files.
+18:50:59.755 WARN  Dependencies/libraries were not provided for analysis of SOURCE files. The 'sonar.java.libraries' property is empty. Verify your configuration, as you might end up with less precise results.
+18:50:59.758 WARN  Unresolved imports/types have been detected during analysis. Enable DEBUG mode to see them.
+18:50:59.759 WARN  Use of preview features have been detected during analysis. Enable DEBUG mode to see them.
+18:50:59.760 INFO  No "Test" source files to scan.
+18:50:59.760 INFO  No "Generated" source files to scan.
+18:50:59.761 INFO  Sensor JavaSensor [java] (done) | time=4626ms
+18:50:59.761 INFO  Sensor JaCoCo XML Report Importer [jacoco]
+18:50:59.765 INFO  'sonar.coverage.jacoco.xmlReportPaths' is not defined. Using default locations: target/site/jacoco/jacoco.xml,target/site/jacoco-it/jacoco.xml,build/reports/jacoco/test/jacocoTestReport.xml
+18:50:59.767 INFO  No report imported, no coverage information will be imported by JaCoCo XML Report Importer
+18:50:59.768 INFO  Sensor JaCoCo XML Report Importer [jacoco] (done) | time=7ms
+18:50:59.769 INFO  Sensor CSS Rules [javascript]
+18:50:59.771 INFO  No CSS, PHP, HTML or VueJS files are found in the project. CSS analysis is skipped.
+18:50:59.772 INFO  Sensor CSS Rules [javascript] (done) | time=2ms
+18:50:59.772 INFO  Sensor C# Project Type Information [csharp]
+18:50:59.773 INFO  Sensor C# Project Type Information [csharp] (done) | time=1ms
+18:50:59.774 INFO  Sensor C# Analysis Log [csharp]
+18:50:59.819 INFO  Sensor C# Analysis Log [csharp] (done) | time=45ms
+18:50:59.819 INFO  Sensor C# Properties [csharp]
+18:50:59.820 INFO  Sensor C# Properties [csharp] (done) | time=1ms
+18:50:59.820 INFO  Sensor SurefireSensor [java]
+18:50:59.822 INFO  parsing [/var/jenkins_home/workspace/sast-cdy2203-backend/target/surefire-reports]
+18:50:59.825 INFO  Sensor SurefireSensor [java] (done) | time=5ms
+18:50:59.827 INFO  Sensor HTML [web]
+18:50:59.833 INFO  Sensor HTML [web] (done) | time=6ms
+18:50:59.834 INFO  Sensor TextAndSecretsSensor [text]
+18:50:59.862 INFO  23 source files to be analyzed
+18:50:59.922 INFO  23/23 source files have been analyzed
+18:50:59.923 INFO  Sensor TextAndSecretsSensor [text] (done) | time=89ms
+18:50:59.923 INFO  Sensor VB.NET Project Type Information [vbnet]
+18:50:59.925 INFO  Sensor VB.NET Project Type Information [vbnet] (done) | time=2ms
+18:50:59.926 INFO  Sensor VB.NET Analysis Log [vbnet]
+18:50:59.952 INFO  Sensor VB.NET Analysis Log [vbnet] (done) | time=26ms
+18:50:59.952 INFO  Sensor VB.NET Properties [vbnet]
+18:50:59.953 INFO  Sensor VB.NET Properties [vbnet] (done) | time=1ms
+18:50:59.953 INFO  Sensor IaC Docker Sensor [iac]
+18:50:59.961 INFO  0 source files to be analyzed
+18:51:00.076 INFO  0/0 source files have been analyzed
+18:51:00.077 INFO  Sensor IaC Docker Sensor [iac] (done) | time=124ms
+18:51:00.082 INFO  ------------- Run sensors on project
+18:51:00.177 INFO  Sensor Analysis Warnings import [csharp]
+18:51:00.178 INFO  Sensor Analysis Warnings import [csharp] (done) | time=1ms
+18:51:00.178 INFO  Sensor Zero Coverage Sensor
+18:51:00.197 INFO  Sensor Zero Coverage Sensor (done) | time=19ms
+18:51:00.197 INFO  Sensor Java CPD Block Indexer
+18:51:00.279 INFO  Sensor Java CPD Block Indexer (done) | time=82ms
+18:51:00.312 INFO  CPD Executor 7 files had no CPD blocks
+18:51:00.312 INFO  CPD Executor Calculating CPD for 16 files
+18:51:00.348 INFO  CPD Executor CPD calculation finished (done) | time=34ms
+18:51:00.520 INFO  Analysis report generated in 159ms, dir size=212.1 kB
+18:51:00.653 INFO  Analysis report compressed in 132ms, zip size=72.5 kB
+18:51:00.726 INFO  Analysis report uploaded in 71ms
+18:51:00.728 INFO  ANALYSIS SUCCESSFUL, you can find the results at: http://sonarqube:9000/dashboard?id=cdy2203-backend
+18:51:00.728 INFO  Note that you will be able to access the updated dashboard once the server has processed the submitted analysis report
+18:51:00.728 INFO  More about the report processing at http://sonarqube:9000/api/ce/task?id=AZ4TOnzBUiMt_q_uolsP
+18:51:00.758 INFO  Analysis total time: 13.997 s
+18:51:00.760 INFO  EXECUTION SUCCESS
+18:51:00.761 INFO  Total time: 22.002s
+Finished: SUCCESS
+
