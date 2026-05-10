@@ -22,6 +22,12 @@ import org.springframework.web.client.RestTemplate;
 @EnableWebSecurity
 public class WebSecurityConfig {
 
+    // Constantes para evitar duplicacion de literales (Sonar java:S1192)
+    private static final String LOGIN_PATH = "/login";
+    // Default password ONLY for local in-memory dev users; en produccion debe sustituirse
+    // por un IdP / DB con BCrypt + secretos por usuario.
+    private static final String DEV_DEFAULT_PASSWORD = "password";
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
@@ -47,17 +53,17 @@ public class WebSecurityConfig {
                 ))
             )
             .authorizeHttpRequests(requests -> requests
-                .requestMatchers("/", "/home", "/login", "/css/**", "/**.css").permitAll()
+                .requestMatchers("/", "/home", LOGIN_PATH, "/css/**", "/**.css").permitAll()
                 .requestMatchers("/pets", "/api/auth/login", "/api/auth/logout").permitAll()
                 .requestMatchers("/api/pets", "/api/pets/available", "/api/pets/search").permitAll()
                 .requestMatchers("/patients/**", "/appointments/**", "/pets/new").authenticated()
                 .anyRequest().authenticated()
             )
-            .exceptionHandling(ex -> ex.authenticationEntryPoint(new LoginUrlAuthenticationEntryPoint("/login")))
+            .exceptionHandling(ex -> ex.authenticationEntryPoint(new LoginUrlAuthenticationEntryPoint(LOGIN_PATH)))
             .formLogin(form -> form.disable())
             .logout(logout -> logout
                 .logoutUrl("/logout")
-                .logoutSuccessUrl("/login")
+                .logoutSuccessUrl(LOGIN_PATH)
             );
 
         return http.build();
@@ -78,19 +84,19 @@ public class WebSecurityConfig {
     public UserDetailsService users() {
         UserDetails user = User.builder()
                 .username("user")
-                .password(passwordEncoder().encode("password"))
+                .password(passwordEncoder().encode(DEV_DEFAULT_PASSWORD))
                 .roles("USER")
                 .build();
 
         UserDetails admin = User.builder()
                 .username("admin")
-                .password(passwordEncoder().encode("password"))
+                .password(passwordEncoder().encode(DEV_DEFAULT_PASSWORD))
                 .roles("USER", "ADMIN")
                 .build();
 
         UserDetails manager = User.builder()
                 .username("manager")
-                .password(passwordEncoder().encode("password"))
+                .password(passwordEncoder().encode(DEV_DEFAULT_PASSWORD))
                 .roles("USER")
                 .build();
 
@@ -102,3 +108,4 @@ public class WebSecurityConfig {
         return new BCryptPasswordEncoder();
     }
 }
+

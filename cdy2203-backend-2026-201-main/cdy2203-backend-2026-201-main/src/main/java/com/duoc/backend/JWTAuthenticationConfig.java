@@ -33,7 +33,7 @@ public class JWTAuthenticationConfig {
                 .issuedAt(new Date(System.currentTimeMillis()))
                 .expiration(new Date(System.currentTimeMillis() + 1000 * 60 * 1440))
                 .and()
-                .signWith(getSigningKey(SUPER_SECRET_KEY))
+                .signWith(getSigningKey(getJwtSigningKey()))
                 .compact();
 
         return "Bearer " + token;

@@ -22,6 +22,12 @@ public class BackendService {
 
     private static final Logger log = LoggerFactory.getLogger(BackendService.class);
 
+    // Constantes para evitar duplicacion de literales (Sonar java:S1192)
+    private static final String BEARER_PREFIX = "Bearer ";
+    private static final String AUTHORIZATION_HEADER = "Authorization";
+    private static final String PETS_PATH = "/pets";
+    private static final String PATIENTS_PATH = "/patients/";
+
     private final RestTemplate restTemplate;
     private final String backendBaseUrl;
 
@@ -36,7 +42,7 @@ public class BackendService {
             ResponseEntity<String> response = restTemplate.postForEntity(backendBaseUrl + "/login", authRequest, String.class);
             log.debug("Backend login response status={} body={}", response.getStatusCode(), response.getBody());
             String token = response.getBody();
-            if (token != null && token.startsWith("Bearer ")) {
+            if (token != null && token.startsWith(BEARER_PREFIX)) {
                 token = token.substring(7);
             }
             log.debug("<- BackendService.login token={}", token);
@@ -49,13 +55,13 @@ public class BackendService {
 
     public List<Map<String, Object>> getPets(String jwtToken) {
         HttpHeaders headers = new HttpHeaders();
-        headers.set("Authorization", "Bearer " + jwtToken);
+        headers.set(AUTHORIZATION_HEADER, BEARER_PREFIX + jwtToken);
         HttpEntity<Void> entity = new HttpEntity<>(headers);
 
         log.debug("-> BackendService.getPets Authorization={}", jwtToken);
         try {
             ResponseEntity<Map[]> response = restTemplate.exchange(
-                    backendBaseUrl + "/pets",
+                    backendBaseUrl + PETS_PATH,
                     HttpMethod.GET,
                     entity,
                     Map[].class
@@ -73,7 +79,7 @@ public class BackendService {
 
     public List<Map<String, Object>> getPatients(String jwtToken) {
         HttpHeaders headers = new HttpHeaders();
-        headers.set("Authorization", "Bearer " + jwtToken);
+        headers.set(AUTHORIZATION_HEADER, BEARER_PREFIX + jwtToken);
         HttpEntity<Void> entity = new HttpEntity<>(headers);
 
         log.debug("-> BackendService.getPatients Authorization={}", jwtToken);
@@ -119,7 +125,7 @@ public class BackendService {
         log.debug("-> BackendService.getPatientById id={} Authorization=Bearer {}", id, jwtToken);
         try {
             ResponseEntity<Map> response = restTemplate.exchange(
-                    backendBaseUrl + "/patients/" + id,
+                    backendBaseUrl + PATIENTS_PATH + id,
                     HttpMethod.GET,
                     entity,
                     Map.class
@@ -143,7 +149,7 @@ public class BackendService {
         log.debug("-> BackendService.updatePatient id={} Authorization=Bearer {} patient={}", id, jwtToken, patient);
         try {
             ResponseEntity<Map> response = restTemplate.exchange(
-                    backendBaseUrl + "/patients/" + id,
+                    backendBaseUrl + PATIENTS_PATH + id,
                     HttpMethod.PUT,
                     entity,
                     Map.class
@@ -163,7 +169,7 @@ public class BackendService {
 
         log.debug("-> BackendService.deletePatient id={} Authorization=Bearer {}", id, jwtToken);
         restTemplate.exchange(
-                backendBaseUrl + "/patients/" + id,
+                backendBaseUrl + PATIENTS_PATH + id,
                 HttpMethod.DELETE,
                 entity,
                 Void.class
@@ -172,12 +178,12 @@ public class BackendService {
 
     public Map<String, Object> createPet(String jwtToken, Map<String, Object> pet) {
         HttpHeaders headers = new HttpHeaders();
-        headers.set("Authorization", "Bearer " + jwtToken);
+        headers.set(AUTHORIZATION_HEADER, BEARER_PREFIX + jwtToken);
         HttpEntity<Map<String, Object>> entity = new HttpEntity<>(pet, headers);
 
         log.debug("-> BackendService.createPet Authorization={} pet={}", jwtToken, pet);
         try {
-            Map response = restTemplate.postForObject(backendBaseUrl + "/pets", entity, Map.class);
+            Map response = restTemplate.postForObject(backendBaseUrl + PETS_PATH, entity, Map.class);
             log.debug("<- BackendService.createPet response={}", response);
             return response;
         } catch (HttpStatusCodeException ex) {
@@ -188,7 +194,7 @@ public class BackendService {
 
 public List<Map<String, Object>> getAppointments(String jwtToken) {
         HttpHeaders headers = new HttpHeaders();
-        headers.set("Authorization", "Bearer " + jwtToken);        HttpEntity<Void> entity = new HttpEntity<>(headers);
+        headers.set(AUTHORIZATION_HEADER, BEARER_PREFIX + jwtToken);        HttpEntity<Void> entity = new HttpEntity<>(headers);
         log.debug("-> BackendService.getAppointments Authorization={}", jwtToken);
         try {
             ResponseEntity<Map[]> response = restTemplate.exchange(
@@ -228,7 +234,7 @@ public List<Map<String, Object>> getAppointments(String jwtToken) {
         log.debug("-> BackendService.getPets");
         try {
             ResponseEntity<Map[]> response = restTemplate.exchange(
-                    backendBaseUrl + "/pets",
+                    backendBaseUrl + PETS_PATH,
                     HttpMethod.GET,
                     null,
                     Map[].class
@@ -336,3 +342,4 @@ public List<Map<String, Object>> getAppointments(String jwtToken) {
         }
     }
 }
+

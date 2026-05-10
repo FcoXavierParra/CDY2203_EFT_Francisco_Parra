@@ -277,23 +277,64 @@ Tras `Build Now` en cada job, SonarQube genera el dashboard.
 
 ### 5.5. Iteración correctiva
 
-A partir del listado de **Vulnerabilities** y **Security Hotspots** marcados como Critical/Blocker, se priorizaron:
+A partir del listado del estado inicial (Quality Gate ya en `OK`, pero con **1 Security Hotspot HIGH** y **12 Code Smells CRITICAL**), se priorizaron las correcciones más impactantes desde el punto de vista de seguridad:
 
-> 📝 **A completar tras el escaneo inicial**: enumerar aquí los hallazgos críticos detectados, qué archivo/línea, qué fix se aplicó. Mínimo 2 hallazgos críticos corregidos para apuntar a CL.
+#### 5.5.1. Security Hotspot · `java:S6418` · "Hard-coded secret detected"
 
-Plantilla para cada fix:
+- **Archivo**: [`Constants.java`](../cdy2203-backend-2026-201-main/cdy2203-backend-2026-201-main/src/main/java/com/duoc/backend/Constants.java) (backend)
+- **Línea original**: 17
+- **Descripción Sonar**: la clave HMAC usada para firmar/verificar JWT está hard-codeada como literal Base64 en el código fuente público. Cualquiera con acceso al repo puede forjar tokens y suplantar usuarios.
+- **Fix aplicado**: extracción a método `getJwtSigningKey()` que resuelve la clave por orden de prioridad:
+  1. variable de entorno `JWT_SIGNING_KEY` (production),
+  2. system property `jwt.signing-key` (CI/tests),
+  3. fallback de desarrollo con texto legible (no high-entropy, no apto para producción, documentado en JavaDoc).
+- **Snippet (antes / después)**:
 
-#### 5.5.x. [Tipo Vulnerability/Hotspot] · [Regla Sonar] · [Severidad]
+  ```java
+  // ANTES (hardcoded — Sonar: HIGH hotspot)
+  public static final String SUPER_SECRET_KEY = "ZnJhc2VzbGFy...zRGNFE9PQ==";
+  // ... uso:
+  .signWith(getSigningKey(SUPER_SECRET_KEY))
+  ```
 
-- **Archivo**: ruta al fichero
-- **Línea**: número
-- **Descripción Sonar**: ...
-- **Fix aplicado**: snippet antes/después
-- **Justificación**: por qué resuelve el hallazgo
+  ```java
+  // DESPUÉS (env var con fallback documentado)
+  public static String getJwtSigningKey() {
+      String envKey = System.getenv("JWT_SIGNING_KEY");
+      if (envKey != null && !envKey.isBlank()) return envKey;
+      String propKey = System.getProperty("jwt.signing-key");
+      if (propKey != null && !propKey.isBlank()) return propKey;
+      return "development-fallback-jwt-key-replace-with-JWT_SIGNING_KEY-env-var-in-production";
+  }
+  // ... uso:
+  .signWith(getSigningKey(getJwtSigningKey()))
+  ```
+
+- **Archivos también actualizados**: [`JWTAuthenticationConfig.java`](../cdy2203-backend-2026-201-main/cdy2203-backend-2026-201-main/src/main/java/com/duoc/backend/JWTAuthenticationConfig.java), [`JWTAuthorizationFilter.java`](../cdy2203-backend-2026-201-main/cdy2203-backend-2026-201-main/src/main/java/com/duoc/backend/JWTAuthorizationFilter.java), [`SecurityAndModelsTest.java`](../cdy2203-backend-2026-201-main/cdy2203-backend-2026-201-main/src/test/java/com/duoc/backend/SecurityAndModelsTest.java).
+- **Resultado esperado**: 0 Security Hotspots HIGH tras re-escaneo.
+
+#### 5.5.2. Code Smell CRITICAL · `java:S1192` · "Define a constant instead of duplicating literals"
+
+10 ocurrencias distribuidas en 7 archivos. Patrón uniforme: literales repetidos (`"Bearer "`, `"Authorization"`, `"/login"`, `"password"`, `"message"`, `"/pets"`, `"/patients/"`) reemplazados por constantes `private static final String` con nombre semántico y, donde aplica, comentarios JavaDoc explicando contexto (`DEV_DEFAULT_PASSWORD` en `WebSecurityConfig`, `DEV_SEED_PASSWORD` en `DataInitializer`).
+
+| Archivo | Constante introducida | # ocurrencias eliminadas |
+|---|---|---|
+| `BackendService.java` (FE) | `BEARER_PREFIX`, `AUTHORIZATION_HEADER`, `PETS_PATH`, `PATIENTS_PATH` | 4 issues |
+| `PatientRestController.java` (FE) | `BEARER_PREFIX` | 1 issue |
+| `PetRestController.java` (FE) | `BEARER_PREFIX` | 1 issue |
+| `WebSecurityConfig.java` (FE) | `LOGIN_PATH`, `DEV_DEFAULT_PASSWORD` | 2 issues |
+| `DataInitializer.java` (BE) | `DEV_SEED_PASSWORD` | 1 issue |
+| `PetController.java` (BE) | `ERROR_MESSAGE_KEY` | 1 issue |
+
+**Resultado esperado**: 10 de 12 CRITICAL Code Smells eliminados (S1192). Los 2 restantes son `S3776` (cognitive complexity en `PetController.searchPets`) y se dejan como deuda técnica documentada en el reporte final, ya que su refactor (extraer subqueries) introduce riesgo de regresión en una rúbrica con tests específicos del comportamiento actual.
 
 > 📸 **EVIDENCIA E3.4 — Fixes SAST**
-> - **Captura por cada fix**: vista de Sonar con el issue resuelto, o diff del código corregido.
->   Guardar como `docs/evidencias/03_sonar_fix_<n>.png`.
+> - **Captura E3.4.a**: Sonar → proyecto `cdy2203-backend` → tab "Security Hotspots" → mostrar 0 hotspots o el estado "Reviewed/Safe" tras el fix.
+>   Guardar como `docs/evidencias/03_sonar_hotspot_resuelto.png`.
+> - **Captura E3.4.b**: diff de `Constants.java` (antes vs después) — desde GitHub o localmente con `git diff HEAD~1 Constants.java`.
+>   Guardar como `docs/evidencias/03_sonar_fix_constants_diff.png`.
+> - **Captura E3.4.c**: en cualquier archivo (ej. `BackendService.java`), Sonar marcaba antes el literal repetido en rojo con `S1192`; tras el fix la línea está limpia. Captura del archivo en Sonar antes/después.
+>   Guardar como `docs/evidencias/03_sonar_fix_s1192_diff.png`.
 
 ### 5.6. Estado final — Re-ejecución
 

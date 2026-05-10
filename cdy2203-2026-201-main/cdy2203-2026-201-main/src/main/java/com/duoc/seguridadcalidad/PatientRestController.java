@@ -22,6 +22,8 @@ import java.util.Map;
 public class PatientRestController {
 
     private static final Logger log = LoggerFactory.getLogger(PatientRestController.class);
+    private static final String BEARER_PREFIX = "Bearer ";
+
     private final BackendService backendService;
 
     public PatientRestController(BackendService backendService) {
@@ -31,7 +33,7 @@ public class PatientRestController {
     @GetMapping
     public ResponseEntity<List<Map<String, Object>>> getAll(@RequestHeader(value = "Authorization", required = false) String authorizationHeader) {
         log.debug("GET /api/patients Authorization={}", authorizationHeader);
-        if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
+        if (authorizationHeader == null || !authorizationHeader.startsWith(BEARER_PREFIX)) {
             log.warn("GET /api/patients missing or invalid Authorization header");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
@@ -45,7 +47,7 @@ public class PatientRestController {
     public ResponseEntity<Map<String, Object>> getById(@RequestHeader(value = "Authorization", required = false) String authorizationHeader,
                                                        @PathVariable Long id) {
         log.debug("GET /api/patients/{} Authorization={}", id, authorizationHeader);
-        if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
+        if (authorizationHeader == null || !authorizationHeader.startsWith(BEARER_PREFIX)) {
             log.warn("GET /api/patients/{} missing or invalid Authorization header", id);
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
@@ -62,7 +64,7 @@ public class PatientRestController {
                                                       @PathVariable Long id,
                                                       @RequestBody Map<String, Object> patient) {
         log.debug("PUT /api/patients/{} Authorization={} payload={}", id, authorizationHeader, patient);
-        if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
+        if (authorizationHeader == null || !authorizationHeader.startsWith(BEARER_PREFIX)) {
             log.warn("PUT /api/patients/{} missing or invalid Authorization header", id);
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
@@ -75,7 +77,7 @@ public class PatientRestController {
     public ResponseEntity<Map<String, Object>> create(@RequestHeader(value = "Authorization", required = false) String authorizationHeader,
                                          @RequestBody Map<String, Object> patient) {
         log.debug("POST /api/patients Authorization={} payload={}", authorizationHeader, patient);
-        if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
+        if (authorizationHeader == null || !authorizationHeader.startsWith(BEARER_PREFIX)) {
             log.warn("POST /api/patients missing or invalid Authorization header");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
@@ -89,7 +91,7 @@ public class PatientRestController {
     public ResponseEntity<String> delete(@RequestHeader(value = "Authorization", required = false) String authorizationHeader,
                                          @PathVariable Long id) {
         log.debug("DELETE /api/patients/{} Authorization={}", id, authorizationHeader);
-        if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
+        if (authorizationHeader == null || !authorizationHeader.startsWith(BEARER_PREFIX)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
         try {
@@ -101,3 +103,4 @@ public class PatientRestController {
         }
     }
 }
+

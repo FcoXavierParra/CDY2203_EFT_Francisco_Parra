@@ -8,6 +8,10 @@ import org.springframework.stereotype.Component;
 @Component
 public class DataInitializer implements CommandLineRunner {
 
+    // Sonar java:S1192 - constante para el password seed de los usuarios in-memory.
+    // En produccion estos usuarios se crean desde un IdP / CSV externo, no aqui.
+    private static final String DEV_SEED_PASSWORD = "password";
+
     @Autowired
     private UserRepository userRepository;
 
@@ -19,9 +23,9 @@ public class DataInitializer implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        ensureUserExists("user", "password", "user@example.com");
-        ensureUserExists("admin", "password", "admin@example.com");
-        ensureUserExists("manager", "password", "manager@example.com");
+        ensureUserExists("user", DEV_SEED_PASSWORD, "user@example.com");
+        ensureUserExists("admin", DEV_SEED_PASSWORD, "admin@example.com");
+        ensureUserExists("manager", DEV_SEED_PASSWORD, "manager@example.com");
 
         if (patientRepository.count() == 0) {
             patientRepository.save(new Patient("can", "Perro", "quiltr0", 1, "Jhon Wick", "jhon.wick@example.com", "+56991234567"));

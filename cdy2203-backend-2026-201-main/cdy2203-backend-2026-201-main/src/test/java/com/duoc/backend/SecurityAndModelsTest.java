@@ -23,7 +23,7 @@ class SecurityAndModelsTest {
         assertTrue(token.startsWith("Bearer "));
         String compact = token.substring(7);
         String subject = Jwts.parser()
-                .verifyWith((javax.crypto.SecretKey) Constants.getSigningKey(Constants.SUPER_SECRET_KEY))
+                .verifyWith((javax.crypto.SecretKey) Constants.getSigningKey(Constants.getJwtSigningKey()))
                 .build()
                 .parseSignedClaims(compact)
                 .getPayload()
@@ -37,8 +37,10 @@ class SecurityAndModelsTest {
         assertEquals("Authorization", Constants.HEADER_AUTHORIZACION_KEY);
         assertEquals("Bearer ", Constants.TOKEN_BEARER_PREFIX);
         assertEquals("https://www.duocuc.cl/", Constants.ISSUER_INFO);
-        Key utf8Key = Constants.getSigningKey(Constants.SUPER_SECRET_KEY);
-        Key b64Key = Constants.getSigningKeyB64(Constants.SUPER_SECRET_KEY);
+        Key utf8Key = Constants.getSigningKey(Constants.getJwtSigningKey());
+        // getSigningKeyB64 espera base64 valido. Usamos un literal base64 fijo para
+        // este test - el fallback de getJwtSigningKey() es texto legible (no base64).
+        Key b64Key = Constants.getSigningKeyB64("ZGV2ZWxvcG1lbnRGYWxsYmFja0p3dEtleVJlcGxhY2VXaXRoSnd0U2lnbmluZ0tleUVudlZhcg==");
         assertNotNull(utf8Key);
         assertNotNull(b64Key);
     }

@@ -20,6 +20,9 @@ import java.util.Optional;
 @RestController
 public class PetController {
 
+    // Sonar java:S1192 - clave de mensaje de error usada en multiples respuestas.
+    private static final String ERROR_MESSAGE_KEY = "message";
+
     @Autowired
     private PetRepository petRepository;
 
@@ -30,7 +33,7 @@ public class PetController {
             return ResponseEntity.status(HttpStatus.CREATED).body(pet);
         } catch (Exception e) {
             Map<String, String> error = new HashMap<>();
-            error.put("message", "Error al registrar mascota: " + e.getMessage());
+            error.put(ERROR_MESSAGE_KEY, "Error al registrar mascota: " + e.getMessage());
             return ResponseEntity.badRequest().body(error);
         }
     }
@@ -106,7 +109,7 @@ public class PetController {
             }
         } catch (Exception e) {
             Map<String, String> error = new HashMap<>();
-            error.put("message", "Error al actualizar mascota: " + e.getMessage());
+            error.put(ERROR_MESSAGE_KEY, "Error al actualizar mascota: " + e.getMessage());
             return ResponseEntity.badRequest().body(error);
         }
     }
@@ -118,14 +121,14 @@ public class PetController {
             if (pet.isPresent()) {
                 petRepository.deleteById(id);
                 Map<String, String> response = new HashMap<>();
-                response.put("message", "Mascota eliminada exitosamente");
+                response.put(ERROR_MESSAGE_KEY, "Mascota eliminada exitosamente");
                 return ResponseEntity.ok(response);
             } else {
                 return ResponseEntity.notFound().build();
             }
         } catch (Exception e) {
             Map<String, String> error = new HashMap<>();
-            error.put("message", "Error al eliminar mascota: " + e.getMessage());
+            error.put(ERROR_MESSAGE_KEY, "Error al eliminar mascota: " + e.getMessage());
             return ResponseEntity.badRequest().body(error);
         }
     }
@@ -144,27 +147,27 @@ public class PetController {
             if (species != null && gender != null && location != null && age != null) {
                 pets = petRepository.findBySpeciesAndGenderAndLocationAndAgeAndStatus(species, gender, location, age, status);
             }
-            // Caso 2: Especie, Género, Ubicación
+            // Caso 2: Especie, GÃ©nero, UbicaciÃ³n
             else if (species != null && gender != null && location != null) {
                 pets = petRepository.findBySpeciesAndGenderAndLocationAndStatus(species, gender, location, status);
             }
-            // Caso 3: Especie, Género, Edad
+            // Caso 3: Especie, GÃ©nero, Edad
             else if (species != null && gender != null && age != null) {
                 pets = petRepository.findBySpeciesAndGenderAndAgeAndStatus(species, gender, age, status);
             }
-            // Caso 4: Especie, Ubicación, Edad
+            // Caso 4: Especie, UbicaciÃ³n, Edad
             else if (species != null && location != null && age != null) {
                 pets = petRepository.findBySpeciesAndLocationAndAgeAndStatus(species, location, age, status);
             }
-            // Caso 5: Género, Ubicación, Edad
+            // Caso 5: GÃ©nero, UbicaciÃ³n, Edad
             else if (gender != null && location != null && age != null) {
                 pets = petRepository.findByGenderAndLocationAndAgeAndStatus(gender, location, age, status);
             }
-            // Caso 6: Especie, Género
+            // Caso 6: Especie, GÃ©nero
             else if (species != null && gender != null) {
                 pets = petRepository.findBySpeciesAndGenderAndStatus(species, gender, status);
             }
-            // Caso 7: Especie, Ubicación
+            // Caso 7: Especie, UbicaciÃ³n
             else if (species != null && location != null) {
                 pets = petRepository.findBySpeciesAndLocationAndStatus(species, location, status);
             }
@@ -172,15 +175,15 @@ public class PetController {
             else if (species != null && age != null) {
                 pets = petRepository.findBySpeciesAndAgeAndStatus(species, age, status);
             }
-            // Caso 9: Género, Ubicación
+            // Caso 9: GÃ©nero, UbicaciÃ³n
             else if (gender != null && location != null) {
                 pets = petRepository.findByGenderAndLocationAndStatus(gender, location, status);
             }
-            // Caso 10: Género, Edad
+            // Caso 10: GÃ©nero, Edad
             else if (gender != null && age != null) {
                 pets = petRepository.findByGenderAndAgeAndStatus(gender, age, status);
             }
-            // Caso 11: Ubicación, Edad
+            // Caso 11: UbicaciÃ³n, Edad
             else if (location != null && age != null) {
                 pets = petRepository.findByLocationAndAgeAndStatus(location, age, status);
             }
@@ -188,11 +191,11 @@ public class PetController {
             else if (species != null) {
                 pets = petRepository.findBySpeciesAndStatus(species, status);
             }
-            // Caso 13: Solo Género
+            // Caso 13: Solo GÃ©nero
             else if (gender != null) {
                 pets = petRepository.findByGenderAndStatus(gender, status);
             }
-            // Caso 14: Solo Ubicación
+            // Caso 14: Solo UbicaciÃ³n
             else if (location != null) {
                 pets = petRepository.findByLocationAndStatus(location, status);
             }
@@ -211,3 +214,4 @@ public class PetController {
         }
     }
 }
+

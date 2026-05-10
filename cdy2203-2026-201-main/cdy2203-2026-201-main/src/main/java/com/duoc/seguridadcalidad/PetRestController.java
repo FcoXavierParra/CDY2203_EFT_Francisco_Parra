@@ -23,6 +23,8 @@ import java.util.Map;
 public class PetRestController {
 
     private static final Logger log = LoggerFactory.getLogger(PetRestController.class);
+    private static final String BEARER_PREFIX = "Bearer ";
+
     private final BackendService backendService;
 
     public PetRestController(BackendService backendService) {
@@ -62,7 +64,7 @@ public class PetRestController {
             @RequestBody Map<String, Object> pet
     ) {
         log.debug("POST /api/pets Authorization={} payload={}", authorizationHeader, pet);
-        if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
+        if (authorizationHeader == null || !authorizationHeader.startsWith(BEARER_PREFIX)) {
             log.warn("POST /api/pets missing or invalid Authorization header");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
@@ -79,7 +81,7 @@ public class PetRestController {
             @RequestBody Map<String, Object> pet
     ) {
         log.debug("PUT /api/pets/{} Authorization={} payload={}", id, authorizationHeader, pet);
-        if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
+        if (authorizationHeader == null || !authorizationHeader.startsWith(BEARER_PREFIX)) {
             log.warn("PUT /api/pets/{} missing or invalid Authorization header", id);
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
@@ -95,7 +97,7 @@ public class PetRestController {
             @RequestHeader(value = "Authorization", required = false) String authorizationHeader
     ) {
         log.debug("DELETE /api/pets/{} Authorization={}", id, authorizationHeader);
-        if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
+        if (authorizationHeader == null || !authorizationHeader.startsWith(BEARER_PREFIX)) {
             log.warn("DELETE /api/pets/{} missing or invalid Authorization header", id);
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
@@ -105,3 +107,5 @@ public class PetRestController {
         return ResponseEntity.ok(deleted);
     }
 }
+
+
